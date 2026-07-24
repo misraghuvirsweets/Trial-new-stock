@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Raghuvir Sweets & Bakers — Admin Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght=600&family=Inter:wght=400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#F3EDE2; --surface:#FFFFFF; --text:#261E16; --text-soft:#706254; --border:#DFD2BF;
+      --navy:#2C4A5E; --navy-soft:#DCE6EA; --gold:#96731E; --gold-soft:#F3E7C9;
+      --green:#3D5E26; --green-soft:#DFE8D5; --terracotta:#A63C19; --terracotta-soft:#F5DFD6;
+      --radius:16px;
+    }
+    *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    html,body{ margin:0; background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; }
+    .wrap{ width:100%; max-width:1180px; margin:0 auto; padding:16px 14px 48px; }
+
+    header{ text-align:center; margin-bottom:16px; }
+    header h1{ font-family:'Fraunces',serif; font-size:clamp(20px,4vw,28px); font-weight:600; margin:0; color:var(--text); }
+    header p{ margin:3px 0 0; font-size:13px; color:var(--text-soft); font-weight:500; }
+
+    .panel{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; box-shadow:0 6px 20px rgba(0,0,0,0.04); margin-bottom:16px; }
+    .panel-head{ display:flex; align-items:center; gap:8px; padding:14px 16px; font-family:'Fraunces',serif; font-size:17px; font-weight:600; border-bottom:1px solid var(--border); background:var(--navy-soft); color:var(--navy); }
+    .panel-body{ padding:16px; display:flex; flex-direction:column; gap:12px; }
+
+    .top-tab-row{ display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
+    .top-tab-btn{
+      flex:1 1 110px; padding:12px 4px; border-radius:12px; font-size:13px; font-weight:700;
+      font-family:inherit; cursor:pointer; border:2px solid var(--navy); background:#fff; color:var(--navy);
+    }
+    .top-tab-btn.active{ background:var(--navy); color:#fff; }
+
+    .sub-tab-row{ display:flex; gap:8px; flex-wrap:wrap; }
+    .sub-tab-btn{ padding:9px 14px; border-radius:9px; font-size:12.5px; font-weight:700; font-family:inherit; cursor:pointer; border:2px solid var(--gold); background:#fff; color:var(--gold); }
+    .sub-tab-btn.active{ background:var(--gold); color:#fff; }
+
+    .filter-row{ display:flex; gap:8px; flex-wrap:wrap; }
+    .filter-select, .filter-input{
+      flex:1 1 160px; padding:10px 10px; border:1px solid var(--border); border-radius:10px;
+      font-size:13px; font-family:inherit; background:#fff; color:var(--text); outline:none;
+    }
+    .filter-row input[type=date]{ flex:1 1 160px; padding:10px 10px; border:1px solid var(--border); border-radius:10px; font-size:13px; }
+    .period-toggle-row{ display:flex; gap:8px; }
+    .period-toggle-btn{ flex:1; padding:9px 4px; border-radius:8px; font-size:12.5px; font-weight:700; font-family:inherit; cursor:pointer; border:2px solid var(--navy); background:#fff; color:var(--navy); }
+    .period-toggle-btn.active{ background:var(--navy); color:#fff; }
+    .search-input{ width:100%; padding:11px 14px; border:1px solid var(--border); border-radius:10px; font-size:14px; font-family:inherit; background:#fff; color:var(--text); outline:none; }
+
+    .master-btn { width:100%; padding:14px; border:none; border-radius:10px; font-size:14.5px; font-weight:700; font-family:inherit; color:#fff; cursor:pointer; background:var(--navy); box-shadow:0 4px 12px rgba(0,0,0,0.08); }
+    .master-btn:active { opacity:0.92; transform:translateY(1px); }
+    .master-btn:disabled{ opacity:0.5; cursor:not-allowed; }
+    @media (min-width:700px){ .master-btn{ width:auto; padding:12px 28px; align-self:flex-start; } }
+
+    .history-section-label { display:block; font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-soft); font-weight:700; margin-top:4px; }
+    .scroll-box { border:1px solid var(--border); border-radius:12px; background:#FAF7F2; max-height:440px; overflow-y:auto; padding:2px 12px; }
+    @media (min-width:760px){
+      .scroll-box.grid-box{ display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:10px; padding:12px; align-content:start; }
+      .scroll-box.grid-box .dash-row, .scroll-box.grid-box .history-row{ border:1px solid var(--border); border-radius:10px; padding:12px; background:#fff; border-bottom:1px solid var(--border); }
+    }
+
+    .status-msg-bar{ min-height:18px; font-size:13px; font-weight:600; text-align:center; }
+    .status-msg-bar.success{ color:var(--green); }
+    .status-msg-bar.error{ color:var(--terracotta); }
+
+    .dash-row{ display:flex; flex-direction:column; gap:6px; font-size:13px; padding:11px 0; border-bottom:1px dashed var(--border); }
+    .dash-row:last-child{ border-bottom:none; }
+    .dash-row-top{ display:flex; justify-content:space-between; align-items:baseline; gap:8px; }
+    .dash-row-name{ font-weight:700; color:var(--text); font-size:14px; }
+    .dash-row-loc{ font-size:10.5px; color:var(--navy); font-weight:700; text-transform:uppercase; letter-spacing:0.04em; background:var(--navy-soft); padding:2px 7px; border-radius:6px; white-space:nowrap; }
+    .dash-row-figs{ display:flex; gap:10px; flex-wrap:wrap; font-size:12px; color:var(--text-soft); }
+    .dash-row-figs b{ color:var(--text); }
+    .dash-row-value{ font-weight:700; color:var(--gold); font-size:13px; }
+    .dash-row-flag{ font-size:11px; color:var(--terracotta); font-weight:700; }
+    .dash-row-info{ font-size:11px; color:var(--navy); font-weight:600; }
+
+    .branch-overview-strip{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+    @media (min-width:640px){ .branch-overview-strip{ grid-template-columns:repeat(4,1fr); } }
+    .branch-overview-card{ background:var(--navy); color:#fff; border-radius:12px; padding:12px 14px; display:flex; flex-direction:column; gap:4px; }
+    .branch-overview-card.factory{ background:var(--green); }
+    .branch-overview-card .boc-name{ font-family:'Fraunces',serif; font-size:13.5px; font-weight:600; }
+    .branch-overview-card .boc-value{ font-size:17px; font-weight:700; }
+    .branch-overview-card .boc-meta{ font-size:11px; opacity:0.85; }
+
+    .location-group-header{ grid-column:1/-1; font-family:'Fraunces',serif; font-size:14px; font-weight:600; color:var(--navy); background:var(--navy-soft); padding:8px 12px; border-radius:8px; margin-top:6px; display:flex; justify-content:space-between; align-items:center; }
+    .location-group-header:first-child{ margin-top:0; }
+    .location-group-header .lgh-value{ font-weight:700; color:var(--gold); font-size:12.5px; }
+
+    .totals-bar{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; background:var(--gold-soft); border-radius:10px; padding:12px 14px; font-size:13.5px; font-weight:700; color:var(--gold); }
+
+    .val-item-row{ display:flex; flex-direction:column; gap:5px; font-size:13px; padding:11px 0; border-bottom:1px dashed var(--border); }
+    .val-item-row:last-child{ border-bottom:none; }
+    .val-item-top{ display:flex; justify-content:space-between; align-items:baseline; gap:8px; }
+    .val-item-name{ font-weight:700; color:var(--text); font-size:14px; }
+    .val-item-loc{ font-size:10.5px; color:var(--navy); font-weight:700; text-transform:uppercase; letter-spacing:0.04em; background:var(--navy-soft); padding:2px 7px; border-radius:6px; white-space:nowrap; }
+    .val-item-figs{ display:flex; gap:10px; flex-wrap:wrap; font-size:12px; color:var(--text-soft); }
+    .val-item-figs b{ color:var(--text); }
+    .val-item-value{ font-weight:700; color:var(--gold); font-size:13px; }
+    .grand-total-card{ background:var(--navy); color:#fff; border-radius:14px; padding:16px; text-align:center; }
+    .grand-total-card .label{ font-size:12px; opacity:0.8; text-transform:uppercase; letter-spacing:0.05em; }
+    .grand-total-card .value{ font-family:'Fraunces',serif; font-size:26px; font-weight:600; margin-top:4px; }
+
+    .sales-loc-row{ display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px dashed var(--border); font-size:13.5px; gap:8px; }
+    .sales-loc-row:last-child{ border-bottom:none; }
+    .sales-loc-row b{ color:var(--gold); }
+    .top-product-row{ display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px dashed var(--border); font-size:13px; gap:8px; }
+    .top-product-row:last-child{ border-bottom:none; }
+    .top-product-rank{ color:var(--text-soft); font-size:11px; margin-right:6px; }
+
+    .stock-row{ cursor:pointer; }
+    .stock-row:active{ opacity:0.7; }
+    .stock-badge{ font-weight:700; color:var(--navy); background:#EAF1F4; padding:5px 10px; border-radius:8px; font-size:14px; min-width:34px; text-align:center; }
+    .stock-badge.low{ color:#9E2F11; background:#F5DFD6; }
+    .chevron-icon{ color:var(--text-soft); font-size:14px; }
+    .history-row { display:flex; justify-content:space-between; align-items:center; font-size:13.5px; padding:11px 0; border-bottom:1px dashed var(--border); gap:8px; }
+    .history-row:last-child { border-bottom:none; }
+    .history-left { display:flex; flex-direction:column; gap:2px; min-width:0; }
+    .history-left strong{ overflow-wrap:anywhere; }
+    .history-right { display:flex; align-items:center; gap:12px; flex-shrink:0; }
+
+    #history-view{ display:none; flex-direction:column; gap:12px; }
+    .back-btn{ border:none; background:none; font-size:14px; cursor:pointer; color:var(--navy); padding:2px 0; font-weight:700; align-self:flex-start; }
+    .history-item-header{ background:var(--navy-soft); border-radius:12px; padding:12px 14px; display:flex; flex-direction:column; gap:2px; }
+    .history-item-header strong{ font-family:'Fraunces',serif; font-size:17px; color:var(--navy); }
+    .history-item-header span{ font-size:12px; color:var(--text-soft); font-weight:600; }
+    .txn-row{ display:flex; justify-content:space-between; align-items:center; font-size:13px; padding:10px 0; border-bottom:1px dashed var(--border); gap:8px; }
+    .txn-row:last-child{ border-bottom:none; }
+    .txn-left{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+    .txn-type-tag{ font-weight:700; font-size:13px; }
+    .txn-type-tag.prod{ color:var(--green); } .txn-type-tag.disp{ color:var(--terracotta); } .txn-type-tag.sale{ color:var(--gold); }
+    .txn-qty-change{ font-weight:700; font-size:14px; padding:4px 9px; border-radius:6px; flex-shrink:0; }
+    .txn-qty-change.prod{ color:var(--green); background:var(--green-soft); }
+    .txn-qty-change.disp{ color:var(--terracotta); background:var(--terracotta-soft); }
+    .txn-qty-change.sale{ color:var(--gold); background:var(--gold-soft); }
+
+    .diag-line{ font-size:12px; color:var(--text-soft); line-height:1.7; }
+    .diag-line b{ color:var(--navy); }
+
+    @media (min-width:980px){ .two-col{ display:grid; grid-template-columns:1fr 1fr; gap:16px; align-items:start; } }
+
+    /* ---- Verification tab (formula banner / status pills / table) ---- */
+    .formula-banner{ padding:12px 14px; background:#fff8f0; border:1px dashed var(--gold); border-radius:8px; font-size:13px; color:#5a3a1a; font-weight:600; }
+    .summary{ display:flex; flex-wrap:wrap; gap:10px; }
+    .card{ flex:1; min-width:110px; background:#fff; border:1px solid var(--border); border-radius:10px; padding:12px 14px; text-align:center; }
+    .card .num{ font-size:22px; font-weight:700; }
+    .card .lbl{ font-size:11px; color:#777; margin-top:2px; }
+    table.verify-table{ width:100%; border-collapse:collapse; background:#fff; border-radius:10px; overflow:hidden; font-size:13px; min-width:760px; }
+    table.verify-table th, table.verify-table td{ padding:9px 10px; text-align:left; border-bottom:1px solid var(--border); white-space:nowrap; }
+    table.verify-table th{ background:#faf5f0; font-size:11px; text-transform:uppercase; letter-spacing:.3px; color:#666; }
+    tr.mismatch{ background:#fdecea; }
+    tr.noentry{ background:#f2f2f2; color:#888; }
+    .status-pill{ padding:3px 9px; border-radius:20px; font-size:11px; font-weight:600; white-space:nowrap; }
+    .status-OK{ background:#eafaf1; color:var(--green); }
+    .status-MISMATCH{ background:#fdecea; color:var(--terracotta); }
+    .status-No-Closing-Entry,.status-No-Opening-Data{ background:#eee; color:#7f8c8d; }
+    .status-REORDER{ background:#fdecea; color:var(--terracotta); }
+    .status-LOW{ background:#fff4e0; color:#b8720a; }
+    .status-Unknown{ background:#eee; color:#7f8c8d; }
+    .table-wrap{ overflow-x:auto; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Raghuvir Sweets & Bakers</h1>
+      <p>Admin Dashboard — Verification, Live Stock, Valuation, Reorder &amp; Sales</p>
+    </header>
+
+    <div class="top-tab-row">
+      <button class="top-tab-btn active" id="top-tab-verify" type="button" onclick="switchTopTab('verify')">Verification</button>
+      <button class="top-tab-btn" id="top-tab-stock" type="button" onclick="switchTopTab('stock')">Stock</button>
+      <button class="top-tab-btn" id="top-tab-valuation" type="button" onclick="switchTopTab('valuation')">Valuation</button>
+      <button class="top-tab-btn" id="top-tab-branchstock" type="button" onclick="switchTopTab('branchstock')">Branch Stock</button>
+      <button class="top-tab-btn" id="top-tab-sales" type="button" onclick="switchTopTab('sales')">Sales (POS)</button>
+      <button class="top-tab-btn" id="top-tab-reorder" type="button" onclick="switchTopTab('reorder')">Reorder &amp; Alerts</button>
+      <button class="top-tab-btn" id="top-tab-godown" type="button" onclick="switchTopTab('godown')">Godown</button>
+      <button class="top-tab-btn" id="top-tab-records" type="button" onclick="switchTopTab('records')">Records</button>
+      <button class="top-tab-btn" id="top-tab-links" type="button" onclick="switchTopTab('links')">Links</button>
+      <button class="top-tab-btn" id="top-tab-admin" type="button" onclick="switchTopTab('admin')">Admin</button>
+    </div>
+
+    <!-- =============== VERIFICATION (Bakery closing-stock pipeline) =============== -->
+    <div class="panel" id="view-verify">
+      <div class="panel-head">✅ Daily Closing Stock Verification</div>
+      <div class="panel-body">
+        <p style="font-size:12px; color:var(--text-soft); margin:0;">Expected Closing = Opening Stock (yesterday's closing) + Dispatch Received (today) − Sales Sold (today), compared against the Actual Closing your branch staff enter on the <b>Ram Mandir / Vishrambagh / Miraj</b> sheet tabs. This Actual Closing is also what powers the Stock &amp; Valuation tabs' "Opening Stock" figure — there's no separate opening-stock entry step anymore.</p>
+        <div class="filter-row">
+          <select id="v-branchSelect" class="filter-select"><option value="ALL">All Branches</option></select>
+          <input type="date" id="v-dateSelect" class="filter-input">
+          <select id="v-statusSelect" class="filter-select">
+            <option value="ALL">All</option><option value="OK">OK</option><option value="MISMATCH">Mismatch</option>
+            <option value="No Closing Entry">No Closing Entry</option><option value="No Opening Data">No Opening Data</option>
+          </select>
+        </div>
+        <div class="formula-banner" id="v-formulaBanner"></div>
+        <div class="summary" id="v-summary"></div>
+        <div class="table-wrap">
+          <table class="verify-table" id="v-dataTable">
+            <thead><tr>
+              <th>Branch</th><th>Item</th><th>Opening</th><th>Dispatch</th><th>Sales</th>
+              <th>Expected</th><th>Actual</th><th>Variance</th><th>Status</th>
+            </tr></thead>
+            <tbody id="v-tableBody"><tr><td colspan="9" style="text-align:center; color:#888; padding:15px;">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- =============== STOCK DASHBOARD =============== -->
+    <div class="panel" id="view-stock" hidden>
+      <div class="panel-head">📊 Opening + Stock In − Sales/Dispatched = Current</div>
+      <div class="panel-body">
+        <p style="font-size:12px; color:var(--text-soft); margin:0;">Branch "Opening" and "Current" come straight from the Actual Closing Stock your staff enter on the branch tabs (Verification tab). If today's closing hasn't been entered yet, "Current" falls back to Opening + Dispatch Received − Sales.</p>
+        <p style="font-size:12px; color:var(--text-soft); margin:0;">Dispatched stock only counts toward a branch once that branch confirms receipt on their <a href="javascript:void(0)" onclick="switchTopTab('links')" style="color:var(--navy); font-weight:700;">Branch Dashboard</a> (see the Links tab).</p>
+        <div class="filter-row">
+          <select id="dash-location-filter" class="filter-select">
+            <option value="All">All Locations</option><option value="Savali Factory">Savali Factory</option>
+            <option value="Ram Mandir">Ram Mandir</option><option value="Vishrambagh">Vishrambagh</option><option value="Miraj">Miraj</option>
+          </select>
+          <div class="period-toggle-row" style="flex:1 1 200px;">
+            <button class="period-toggle-btn active" id="period-btn-day" type="button" onclick="setPeriodType('day')">Day</button>
+            <button class="period-toggle-btn" id="period-btn-month" type="button" onclick="setPeriodType('month')">Month</button>
+          </div>
+        </div>
+        <div class="filter-row">
+          <input id="dash-date-input" class="filter-input" type="date">
+          <input id="dash-month-input" class="filter-input" type="month" style="display:none;">
+          <button class="master-btn" type="button" style="flex:1 1 130px;" onclick="setDateToYesterday()">📅 Yesterday</button>
+          <input id="dash-search-input" class="filter-input search-input" type="text" placeholder="Filter by product or category...">
+        </div>
+        <button class="master-btn" type="button" onclick="loadStockDashboard()">🔄 Load Dashboard</button>
+
+        <label class="history-section-label">All Branches — Real-Time Overview</label>
+        <div id="branch-overview-strip" class="branch-overview-strip"></div>
+
+        <label class="history-section-label">Item-Wise Detail</label>
+        <div id="dashboard-results-list" class="scroll-box grid-box">Choose filters above and tap "Load Dashboard".</div>
+
+        <div id="dashboard-totals-bar" class="totals-bar" style="display:none;">
+          <span>Total Stock Value (Sale Rate)</span><span id="dashboard-total-value">₹0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- =============== VALUATION =============== -->
+    <div class="panel" id="view-valuation" hidden>
+      <div class="panel-head">💰 Current Stock Valuation — Item Wise</div>
+      <div class="panel-body">
+        <div class="filter-row">
+          <select id="val-location-filter" class="filter-select">
+            <option value="All">All Locations</option><option value="Savali Factory">Savali Factory</option>
+            <option value="Ram Mandir">Ram Mandir</option><option value="Vishrambagh">Vishrambagh</option><option value="Miraj">Miraj</option>
+          </select>
+          <select id="val-category-filter" class="filter-select"><option value="All">All Categories</option></select>
+        </div>
+        <div class="filter-row">
+          <input id="val-search-input" class="filter-input search-input" type="text" placeholder="Search product name...">
+          <button class="master-btn" type="button" style="flex:1 1 160px;" onclick="loadValuation()">🔄 Load Valuation</button>
+        </div>
+        <div id="valuation-grand-total" class="grand-total-card" style="display:none;">
+          <div class="label">Total Stock Value</div><div class="value" id="valuation-grand-value">₹0</div>
+        </div>
+        <label class="history-section-label">Item Wise Valuation</label>
+        <div id="valuation-items-list" class="scroll-box grid-box">Choose filters above and tap "Load Valuation".</div>
+      </div>
+    </div>
+
+    <!-- =============== BRANCH STOCK =============== -->
+    <div class="panel" id="view-branchstock" hidden>
+      <div class="panel-head">📦 Branch Current Stock</div>
+      <div class="panel-body">
+        <p style="font-size:12px; color:var(--text-soft); margin:0;">Only the 3 outlets — Savali Factory's stock is shown in the <a href="javascript:void(0)" onclick="switchTopTab('godown')" style="color:var(--navy); font-weight:700;">Godown</a> tab.</p>
+        <div class="filter-row">
+          <select id="branchstock-location-filter" class="filter-select">
+            <option value="All Branches">All Branches</option><option value="Ram Mandir">Ram Mandir</option><option value="Vishrambagh">Vishrambagh</option><option value="Miraj">Miraj</option>
+          </select>
+        </div>
+        <div class="filter-row">
+          <input id="branchstock-search-input" class="filter-input search-input" type="text" placeholder="Search product name...">
+          <button class="master-btn" type="button" style="flex:1 1 160px;" onclick="loadBranchStock()">🔄 Load Current Stock</button>
+        </div>
+        <label class="history-section-label">Current Stock (yesterday's closing, or estimate)</label>
+        <div id="branchstock-results-list" class="scroll-box grid-box">Choose filters above and tap "Load Current Stock".</div>
+      </div>
+    </div>
+
+    <!-- =============== SALES DATA (POS) =============== -->
+    <div class="panel" id="view-sales" hidden>
+      <div class="panel-head">🛍️ Sales Data (from POS export)</div>
+      <div class="panel-body">
+        <div class="filter-row">
+          <select id="sales-month-filter" class="filter-select"><option value="">Loading months...</option></select>
+          <button class="master-btn" type="button" style="flex:1 1 160px;" onclick="loadSalesSummary()">🔄 Load Sales Summary</button>
+        </div>
+        <div class="two-col">
+          <div><label class="history-section-label">By Location</label><div id="sales-by-location" class="scroll-box" style="max-height:260px;">Pick a month and tap "Load Sales Summary".</div></div>
+          <div><label class="history-section-label">Top 50 Products (by sales value)</label><div id="sales-top-products" class="scroll-box" style="max-height:400px;"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =============== REORDER & ALERTS (Bakery avg-consumption + WhatsApp) =============== -->
+    <div class="panel" id="view-reorder" hidden>
+      <div class="panel-head">🔔 Reorder Status &amp; WhatsApp Alerts</div>
+      <div class="panel-body">
+        <div class="filter-row">
+          <select id="r-branchSelect" class="filter-select"><option value="ALL">All Branches</option></select>
+          <button class="master-btn" type="button" style="flex:1 1 160px;" onclick="loadAvgTable()">🔄 Load Reorder Table</button>
+        </div>
+        <div class="filter-row">
+          <button class="master-btn" type="button" id="recalcAvgBtn" onclick="recalcAvg()">↻ Recalculate Avg Consumption</button>
+          <button class="master-btn" type="button" id="checkAlertsBtn" onclick="checkAlertsNow()">📲 Check Min Stock &amp; Send Alerts</button>
+          <button class="master-btn" type="button" id="morningSummaryBtn" onclick="sendMorningSummaryNow()">🌅 Send Morning Summary Now</button>
+        </div>
+        <div id="r-status" class="status-msg-bar"></div>
+        <div id="whatsappConfigHint" class="history-section-label" style="text-transform:none; letter-spacing:0; color:var(--text-soft);">WhatsApp (WATI) config status: checking…</div>
+        <label class="history-section-label">Low Stock / Reorder Status</label>
+        <div class="table-wrap">
+          <table class="verify-table" id="avgTable">
+            <thead><tr><th>Branch</th><th>Item</th><th>Current Stock</th><th>Min Stock</th><th>Avg Daily (7d)</th><th>Days Left</th><th>Status</th><th>Last Calculated</th></tr></thead>
+            <tbody id="avgTableBody"><tr><td colspan="8" style="text-align:center; color:#888; padding:15px;">Tap "Load Reorder Table".</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- =============== GODOWN (Savali Factory quick list) =============== -->
+    <div class="panel" id="view-godown" hidden>
+      <div class="panel-head">🏭 Godown Stock (Savali Factory — Master List)</div>
+      <div class="panel-body" id="godown-list-view">
+        <div class="filter-row">
+          <input id="godown-search-input" class="filter-input search-input" type="text" placeholder="Search item name or code..." oninput="filterGodownList(this.value)">
+          <button class="master-btn" type="button" style="flex:1 1 160px;" onclick="loadGodownList()">🔄 Refresh Stock List</button>
+        </div>
+        <label class="history-section-label">Item Wise Current Stock (tap item for history)</label>
+        <div id="godown-list" class="scroll-box grid-box">Loading...</div>
+      </div>
+      <div class="panel-body" id="godown-history-view" style="display:none;">
+        <button class="back-btn" type="button" onclick="backToGodownList()">← Back to Stock List</button>
+        <div id="history-item-header" class="history-item-header"></div>
+        <label class="history-section-label">Full Transaction History</label>
+        <div id="history-list" class="scroll-box">Loading...</div>
+      </div>
+    </div>
+
+    <!-- =============== RECORDS (raw sheet viewers) =============== -->
+    <div class="panel" id="view-records" hidden>
+      <div class="panel-head">📋 Records — Raw Sheet Data</div>
+      <div class="panel-body">
+        <div class="sub-tab-row">
+          <button class="sub-tab-btn active" id="rec-tab-invlog" type="button" onclick="switchRecordsSheet('invlog')">Inventory Log</button>
+          <button class="sub-tab-btn" id="rec-tab-verify" type="button" onclick="switchRecordsSheet('verify')">Stock Verification</button>
+          <button class="sub-tab-btn" id="rec-tab-stockdash" type="button" onclick="switchRecordsSheet('stockdash')">Stock Dashboard Snapshot</button>
+        </div>
+        <div class="filter-row">
+          <select id="rec-type-filter" class="filter-select">
+            <option value="All">All Types</option><option value="PRODUCTION">Production</option><option value="DISPATCH">Dispatch</option><option value="SALE">Sale</option>
+          </select>
+          <select id="rec-location-filter" class="filter-select">
+            <option value="All">All Locations</option><option value="Savali Factory">Savali Factory</option>
+            <option value="Ram Mandir">Ram Mandir</option><option value="Vishrambagh">Vishrambagh</option><option value="Miraj">Miraj</option>
+          </select>
+        </div>
+        <div class="filter-row">
+          <input id="rec-search-input" class="filter-input search-input" type="text" placeholder="Search product name...">
+          <button class="master-btn" type="button" style="flex:1 1 160px;" onclick="loadRecordsData()">🔄 Load Records</button>
+        </div>
+        <label class="history-section-label">Showing most recent 300 rows matching your filters</label>
+        <div id="records-list" class="scroll-box" style="max-height:480px;">Choose a sheet above and tap "Load Records".</div>
+      </div>
+    </div>
+
+    <!-- =============== LINKS =============== -->
+    <div id="view-links" hidden>
+      <div class="panel">
+        <div class="panel-head">📦 Branch Dashboard Links</div>
+        <div class="panel-body">
+          <p style="font-size:12.5px; color:var(--text-soft); margin:0;">Give each branch their own link — they'll see pending dispatches and can tap "Mark as Received" to confirm stock.</p>
+          <div id="branch-dashboard-links-list" style="display:flex; flex-direction:column; gap:6px; font-size:12.5px;">Loading…</div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-head">🔗 Category-Wise Manual Entry Links</div>
+        <div class="panel-body">
+          <p style="font-size:12.5px; color:var(--text-soft); margin:0;">Each link opens the Production/Dispatch Desk with Manual Entry pre-loaded for that category — handy for filling in stock without scanning barcodes.</p>
+          <div id="category-links-list" style="display:flex; flex-direction:column; gap:6px; font-size:12.5px;">Loading categories...</div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-head">🖥️ Production/Dispatch Desk</div>
+        <div class="panel-body">
+          <p style="font-size:12.5px; color:var(--text-soft); margin:0;">General link (no category lock) for scanning/manual entry of Production and Dispatch:</p>
+          <div id="production-desk-link" style="font-size:12.5px;">Loading…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =============== ADMIN / DIAGNOSTICS =============== -->
+    <div class="panel" id="view-admin" hidden>
+      <div class="panel-head">🔧 Admin &amp; System Status</div>
+      <div class="panel-body">
+        <div class="filter-row">
+          <button class="master-btn" type="button" onclick="dashboardRunYesterdayNow()">▶ Process Yesterday Now (Verification)</button>
+          <button class="master-btn" type="button" onclick="setupAllTriggersNow()">⏱ Setup All Triggers</button>
+          <button class="master-btn" type="button" onclick="refreshProductCacheNow()">⚡ Refresh Product Cache</button>
+          <button class="master-btn" type="button" onclick="recalcSnapshotNow()">🔄 Recalculate Live Snapshot Now</button>
+        </div>
+        <div id="admin-status" class="status-msg-bar"></div>
+        <div id="trigger-status-hint" class="history-section-label" style="text-transform:none; letter-spacing:0; color:var(--text-soft);">Trigger status: checking…</div>
+        <label class="history-section-label">System Status</label>
+        <div id="diag-content" class="diag-line">Loading system status...</div>
+      </div>
+    </div>
+
+    <div id="global-status" class="status-msg-bar"></div>
+  </div>
+
+  <script>
+    function $(id){ return document.getElementById(id); }
+    var BRANCHES = ['Ram Mandir', 'Vishrambagh', 'Miraj'];
+    var LOCATION_ORDER = ["Savali Factory"].concat(BRANCHES);
+    var BRANCH_ORDER = BRANCHES;
+
+    function setStatus(msg, cls) { var bar = $("global-status"); bar.innerText = msg; bar.className = "status-msg-bar " + (cls || ""); }
+
+    var categoryLinksLoaded = false;
+    function switchTopTab(tab) {
+      ["verify","stock","valuation","branchstock","sales","reorder","godown","records","links","admin"].forEach(function(t){
+        $("top-tab-" + t).classList.toggle("active", t === tab);
+        $("view-" + t).hidden = (t !== tab);
+      });
+      if (tab === 'sales' && $("sales-month-filter").options.length <= 1) loadSalesMonths();
+      if (tab === 'godown' && !godownListCache.length) loadGodownList();
+      if (tab === 'links' && !categoryLinksLoaded) { loadCategoryLinks(); renderBranchDashboardLinksList(); renderProductionDeskLink(); }
+      if (tab === 'reorder') { loadAvgTable(); }
+    }
+
+    /* ======================= VERIFICATION TAB ======================= */
+    var allVRows = [];
+    var currentDateStr = '', currentPrevStr = '';
+
+    function toDMY(ymd) { if (!ymd) return ''; var p = ymd.split('-'); return p[2] + '/' + p[1] + '/' + p[0]; }
+    function prevDayStr(ymd) {
+      var p = ymd.split('-').map(Number);
+      var d = new Date(p[0], p[1] - 1, p[2]); d.setDate(d.getDate() - 1);
+      var mm = String(d.getMonth() + 1).padStart(2, '0'), dd = String(d.getDate()).padStart(2, '0');
+      return d.getFullYear() + '-' + mm + '-' + dd;
+    }
+
+    function updateVerifyBanner(branchLabel) {
+      var dToday = toDMY(currentDateStr), dPrev = toDMY(currentPrevStr);
+      $("v-formulaBanner").textContent =
+        (branchLabel === 'ALL' ? 'All Branches' : branchLabel) + ' — ' + dToday + ' :  ' +
+        'Opening Stock (Closing of ' + dPrev + ')  +  Dispatch Received (' + dToday + ')  −  Sales Sold (' + dToday + ')  =  Expected Closing (' + dToday + ')';
+    }
+
+    function initVerify() {
+      google.script.run.withSuccessHandler(function(branches){
+        var sel = $("v-branchSelect");
+        branches.forEach(function(b){ var opt = document.createElement("option"); opt.value = b; opt.textContent = b; sel.appendChild(opt); });
+        var rsel = $("r-branchSelect");
+        branches.forEach(function(b){ var opt = document.createElement("option"); opt.value = b; opt.textContent = b; rsel.appendChild(opt); });
+      }).getBranchList();
+
+      google.script.run.withSuccessHandler(function(dates){
+        var input = $("v-dateSelect");
+        var defaultDate;
+        if (dates.length) defaultDate = dates[dates.length - 1];
+        else { var y = new Date(); y.setDate(y.getDate() - 1); defaultDate = y.getFullYear() + '-' + String(y.getMonth()+1).padStart(2,'0') + '-' + String(y.getDate()).padStart(2,'0'); }
+        input.value = defaultDate;
+        loadVerifyData(defaultDate);
+      }).getAvailableDates();
+    }
+
+    function loadVerifyData(dateStr) {
+      if (!dateStr) return;
+      currentDateStr = dateStr; currentPrevStr = prevDayStr(dateStr);
+      updateVerifyBanner($("v-branchSelect").value);
+      $("v-tableBody").innerHTML = '<tr><td colspan="9" style="text-align:center; color:#888; padding:15px;">Loading… (auto-generates if not processed yet)</td></tr>';
+      google.script.run
+        .withSuccessHandler(function(res){
+          if (!res.success) { $("v-tableBody").innerHTML = '<tr><td colspan="9" style="text-align:center; color:#888; padding:15px;">' + res.message + '</td></tr>'; allVRows = []; return; }
+          allVRows = res.rows; renderVerify();
+        })
+        .withFailureHandler(function(err){ $("v-tableBody").innerHTML = '<tr><td colspan="9" style="text-align:center; color:#888; padding:15px;">Error: ' + err.message + '</td></tr>'; })
+        .getOrGenerateVerificationData(dateStr);
+    }
+
+    function renderVerify() {
+      var branchFilter = $("v-branchSelect").value, statusFilter = $("v-statusSelect").value;
+      updateVerifyBanner(branchFilter);
+      var rows = allVRows.filter(function(r){ return (branchFilter === 'ALL' || r.branch === branchFilter) && (statusFilter === 'ALL' || r.status === statusFilter); });
+
+      var tbody = $("v-tableBody"); tbody.innerHTML = '';
+      if (!rows.length) tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; color:#888; padding:15px;">No rows match this filter.</td></tr>';
+      rows.forEach(function(r){
+        var tr = document.createElement('tr');
+        if (r.status === 'MISMATCH') tr.className = 'mismatch'; else if (r.status.indexOf('No ') === 0) tr.className = 'noentry';
+        var statusClass = 'status-' + r.status.replace(/ /g, '-');
+        var openingDisp = (r.opening === '' ? '—' : r.opening);
+        tr.innerHTML = '<td>' + r.branch + '</td><td>' + r.item + '</td><td>' + openingDisp + '</td>' +
+          '<td>' + r.dispatch + '</td><td>' + r.sales + '</td><td>' + r.expected + '</td>' +
+          '<td>' + (r.actual === '' ? '—' : r.actual) + '</td><td>' + (r.variance === '' ? '—' : r.variance) + '</td>' +
+          '<td><span class="status-pill ' + statusClass + '">' + r.status + '</span></td>';
+        tbody.appendChild(tr);
+      });
+
+      var total = rows.length;
+      var mismatches = rows.filter(function(r){ return r.status === 'MISMATCH'; }).length;
+      var ok = rows.filter(function(r){ return r.status === 'OK'; }).length;
+      var noEntry = rows.filter(function(r){ return r.status.indexOf('No ') === 0; }).length;
+      $("v-summary").innerHTML =
+        '<div class="card"><div class="num">' + total + '</div><div class="lbl">Items Shown</div></div>' +
+        '<div class="card"><div class="num" style="color:var(--green)">' + ok + '</div><div class="lbl">OK</div></div>' +
+        '<div class="card"><div class="num" style="color:var(--terracotta)">' + mismatches + '</div><div class="lbl">Mismatches</div></div>' +
+        '<div class="card"><div class="num" style="color:#7f8c8d">' + noEntry + '</div><div class="lbl">No Entry</div></div>';
+    }
+
+    $("v-dateSelect").addEventListener('change', function(e){ loadVerifyData(e.target.value); });
+    $("v-branchSelect").addEventListener('change', renderVerify);
+    $("v-statusSelect").addEventListener('change', renderVerify);
+
+    /* ======================= STOCK DASHBOARD TAB ======================= */
+    var currentPeriodType = 'day';
+    function setPeriodType(type) {
+      currentPeriodType = type;
+      $("period-btn-day").classList.toggle("active", type === 'day');
+      $("period-btn-month").classList.toggle("active", type === 'month');
+      $("dash-date-input").style.display = type === 'day' ? "block" : "none";
+      $("dash-month-input").style.display = type === 'month' ? "block" : "none";
+    }
+
+    function setDateToYesterday() {
+      var yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+      $("dash-date-input").value = yesterday.toISOString().slice(0, 10);
+      loadStockDashboard();
+    }
+
+    function loadStockDashboard() {
+      var location = $("dash-location-filter").value;
+      var periodValue = currentPeriodType === 'day' ? $("dash-date-input").value : $("dash-month-input").value;
+      var search = $("dash-search-input").value;
+      if (!periodValue) { setStatus("Please pick a date/month first.", "error"); return; }
+
+      $("dashboard-results-list").innerHTML = '<div style="text-align:center; color:#888; padding:15px; font-size:13px;">Calculating Opening + In - Sales...</div>';
+      setStatus("Computing stock dashboard...", "");
+
+      google.script.run
+        .withSuccessHandler(function(data){ renderStockDashboard(data, location === "All"); setStatus("Dashboard loaded — " + data.rows.length + " rows.", "success"); })
+        .withFailureHandler(function(e){ setStatus("Dashboard error: " + e.message, "error"); })
+        .getStockDashboardWeb({ location: location, periodType: currentPeriodType, periodValue: periodValue, search: search });
+    }
+
+    function renderBranchOverviewStrip(rows) {
+      var box = $("branch-overview-strip");
+      var byLocation = {};
+      LOCATION_ORDER.forEach(function(loc){ byLocation[loc] = { value: 0, items: 0 }; });
+      rows.forEach(function(r){ if (!byLocation[r.location]) byLocation[r.location] = { value: 0, items: 0 }; byLocation[r.location].value += r.value; byLocation[r.location].items += 1; });
+      var html = "";
+      LOCATION_ORDER.forEach(function(loc){
+        var v = byLocation[loc]; var isFactory = loc === "Savali Factory";
+        html += `<div class="branch-overview-card${isFactory ? ' factory' : ''}"><div class="boc-name">${loc}</div><div class="boc-value">₹${Math.round(v.value).toLocaleString('en-IN')}</div><div class="boc-meta">${v.items} item${v.items !== 1 ? 's' : ''} with stock</div></div>`;
+      });
+      box.innerHTML = html;
+    }
+
+    function renderStockDashboard(data, showOverview) {
+      var box = $("dashboard-results-list");
+      var rows = data.rows || [];
+      var overviewBox = $("branch-overview-strip");
+      if (showOverview) { overviewBox.style.display = "grid"; renderBranchOverviewStrip(rows); } else overviewBox.style.display = "none";
+
+      if (rows.length === 0) {
+        box.innerHTML = '<div style="text-align:center; color:#888; padding:15px; font-size:13px; grid-column:1/-1;">No matching stock activity for this period.</div>';
+        $("dashboard-totals-bar").style.display = "none";
+        return;
+      }
+
+      var byLocation = {};
+      rows.forEach(function(r){ (byLocation[r.location] = byLocation[r.location] || []).push(r); });
+      var locationsPresent = LOCATION_ORDER.filter(function(l){ return byLocation[l]; }).concat(Object.keys(byLocation).filter(function(l){ return LOCATION_ORDER.indexOf(l) === -1; }));
+
+      var html = "";
+      locationsPresent.forEach(function(loc){
+        var locRows = byLocation[loc];
+        var locValue = locRows.reduce(function(sum, r){ return sum + r.value; }, 0);
+        html += `<div class="location-group-header"><span>${loc}</span><span class="lgh-value">₹${locValue.toLocaleString('en-IN')} (${locRows.length} item${locRows.length > 1 ? 's' : ''})</span></div>`;
+        locRows.forEach(function(r){
+          var outLabel = (r.location === "Savali Factory") ? "Dispatched Out" : "Sales";
+          var flag = !r.hasMasterRecord ? '<div class="dash-row-flag">⚠ Not in Master (rate unknown)</div>' : '';
+          var openingFlag = (r.location !== "Savali Factory" && !r.hasOpeningData) ? '<div class="dash-row-flag">⚠ No closing stock entered for the opening anchor date</div>' : '';
+          var estFlag = (r.location !== "Savali Factory" && !r.hasActualClosing) ? '<div class="dash-row-info">ℹ Current stock is an estimate — today\'s closing hasn\'t been entered yet</div>' : '';
+          html += `
+            <div class="dash-row">
+              <div class="dash-row-top"><span class="dash-row-name">${r.product}</span><span class="dash-row-loc">${r.location}</span></div>
+              <div class="dash-row-figs"><span>Opening: <b>${r.opening}</b></span><span>Stock In: <b>${r.stockIn}</b></span><span>${outLabel}: <b>${r.out}</b></span><span>Current: <b>${r.current} ${r.unit}</b></span></div>
+              <div class="dash-row-value">Value: ₹${r.value.toLocaleString('en-IN')} (@ ₹${r.rate}/${r.unit})</div>
+              ${flag}${openingFlag}${estFlag}
+            </div>`;
+        });
+      });
+      box.innerHTML = html;
+      $("dashboard-totals-bar").style.display = "flex";
+      $("dashboard-total-value").innerText = "₹" + (data.totalValue || 0).toLocaleString('en-IN');
+    }
+
+    function loadBranchStock() {
+      var location = $("branchstock-location-filter").value;
+      var search = $("branchstock-search-input").value;
+      var yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+      var periodValue = yesterday.toISOString().slice(0, 10);
+
+      setStatus("Computing current stock...", "");
+      $("branchstock-results-list").innerHTML = '<div style="text-align:center; color:#888; padding:15px; font-size:13px;">Loading...</div>';
+
+      google.script.run
+        .withSuccessHandler(function(data){ renderBranchStock(data.rows || []); setStatus("Current stock loaded — " + (data.rows ? data.rows.length : 0) + " item(s).", "success"); })
+        .withFailureHandler(function(e){ setStatus("Error: " + e.message, "error"); })
+        .getStockDashboardWeb({ location: location, periodType: "day", periodValue: periodValue, search: search });
+    }
+
+    function renderBranchStock(rows) {
+      var box = $("branchstock-results-list");
+      if (!rows || rows.length === 0) { box.innerHTML = '<div style="text-align:center; color:#888; padding:15px; font-size:13px; grid-column:1/-1;">No stock activity found.</div>'; return; }
+      var byLocation = {};
+      rows.forEach(function(r){ (byLocation[r.location] = byLocation[r.location] || []).push(r); });
+      var locationsPresent = BRANCH_ORDER.filter(function(l){ return byLocation[l]; });
+      var html = "";
+      locationsPresent.forEach(function(loc){
+        var locRows = byLocation[loc];
+        html += `<div class="location-group-header"><span>${loc}</span><span class="lgh-value">${locRows.length} item${locRows.length > 1 ? 's' : ''}</span></div>`;
+        locRows.forEach(function(r){
+          var estFlag = !r.hasActualClosing ? '<div class="dash-row-info">ℹ Estimate — no closing entry yet</div>' : '';
+          html += `<div class="dash-row"><div class="dash-row-top"><span class="dash-row-name">${r.product}</span><span class="dash-row-loc">${r.category || '—'}</span></div><div class="dash-row-figs"><span>Current Stock: <b>${r.current} ${r.unit}</b></span></div>${estFlag}</div>`;
+        });
+      });
+      box.innerHTML = html;
+    }
+
+    function loadValuation() {
+      var location = $("val-location-filter").value, category = $("val-category-filter").value, search = $("val-search-input").value;
+      setStatus("Computing valuation...", "");
+      $("valuation-items-list").innerHTML = '<div style="text-align:center; color:#888; padding:15px; font-size:13px;">Loading...</div>';
+
+      google.script.run
+        .withSuccessHandler(function(data){ renderValuation(data); setStatus("Valuation loaded.", "success"); })
+        .withFailureHandler(function(e){ setStatus("Error: " + e.message, "error"); })
+        .getValuationWeb({ location: location, category: category, search: search });
+    }
+
+    function renderValuation(data) {
+      $("valuation-grand-total").style.display = "block";
+      $("valuation-grand-value").innerText = "₹" + (data.grandSaleValue || 0).toLocaleString('en-IN');
+      var box = $("valuation-items-list");
+      var items = data.items || [];
+      if (items.length === 0) { box.innerHTML = '<div style="text-align:center; color:#888; padding:15px; font-size:13px; grid-column:1/-1;">No stock found for these filters.</div>'; return; }
+      var html = "";
+      items.forEach(function(it){
+        html += `<div class="val-item-row"><div class="val-item-top"><span class="val-item-name">${it.product}</span><span class="val-item-loc">${it.location}</span></div><div class="val-item-figs"><span>Category: <b>${it.category || '—'}</b></span><span>Remaining Stock: <b>${it.stock} ${it.unit}</b></span></div><div class="val-item-value">Stock Value: ₹${it.saleValue.toLocaleString('en-IN')} &nbsp;(${it.stock} ${it.unit} × ₹${it.rate}/${it.unit})</div></div>`;
+      });
+      box.innerHTML = html;
+    }
+
+    function loadValuationCategories() {
+      google.script.run.withSuccessHandler(function(cats){
+        var select = $("val-category-filter");
+        select.innerHTML = '<option value="All">All Categories</option>';
+        (cats || []).forEach(function(cat){ var opt = document.createElement("option"); opt.value = cat; opt.innerText = cat; select.appendChild(opt); });
+      }).getCategoriesWeb();
+    }
+
+    /* ======================= SALES (POS) TAB ======================= */
+    function loadSalesMonths() {
+      google.script.run.withSuccessHandler(function(months){
+        var select = $("sales-month-filter"); select.innerHTML = "";
+        if (months && months.length > 0) {
+          months.forEach(function(m){ var opt = document.createElement("option"); opt.value = m; opt.innerText = m; select.appendChild(opt); });
+          select.value = months[months.length - 1];
+        } else select.innerHTML = '<option value="">No months found</option>';
+      }).withFailureHandler(function(e){ setStatus("Could not load month list.", "error"); }).listAvailableSalesMonths();
+    }
+
+    function loadSalesSummary() {
+      var month = $("sales-month-filter").value;
+      if (!month) { setStatus("No month selected.", "error"); return; }
+      $("sales-by-location").innerHTML = '<div style="text-align:center; color:#888; padding:15px; font-size:13px;">Loading...</div>';
+      $("sales-top-products").innerHTML = "";
+      setStatus("Reading POS sales for " + month + "...", "");
+
+      google.script.run
+        .withSuccessHandler(function(res){
+          if (res && res.success) { renderSalesSummary(res); setStatus("Loaded " + res.rowCount + " sale rows for " + month + ".", "success"); }
+          else setStatus("Failed to load sales summary.", "error");
+        })
+        .withFailureHandler(function(e){ setStatus("Sales summary error: " + e.message, "error"); })
+        .getSalesSummaryWeb({ month: month });
+    }
+
+    function renderSalesSummary(data) {
+      var locBox = $("sales-by-location");
+      var locs = Object.keys(data.byLocation || {});
+      if (locs.length === 0) locBox.innerHTML = '<div style="text-align:center; color:#888; padding:15px; font-size:13px;">No sales found for this month.</div>';
+      else {
+        var html = "";
+        locs.forEach(function(loc){ var v = data.byLocation[loc]; html += `<div class="sales-loc-row"><span>${loc}</span><span>Qty: ${v.qty} | <b>₹${v.amount.toLocaleString('en-IN')}</b></span></div>`; });
+        html += `<div class="sales-loc-row" style="font-weight:700;"><span>TOTAL</span><span>Qty: ${data.totalQty} | <b>₹${data.totalAmount.toLocaleString('en-IN')}</b></span></div>`;
+        locBox.innerHTML = html;
+      }
+      var prodBox = $("sales-top-products");
+      var products = data.topProducts || [];
+      if (products.length === 0) { prodBox.innerHTML = '<div style="text-align:center; color:#888; padding:15px; font-size:13px;">No product data.</div>'; return; }
+      var phtml = "";
+      products.forEach(function(p, idx){ phtml += `<div class="top-product-row"><span><span class="top-product-rank">#${idx+1}</span>${p.product}</span><span>Qty: ${p.qty} | <b>₹${p.amount.toLocaleString('en-IN')}</b></span></div>`; });
+      prodBox.innerHTML = phtml;
+    }
+
+    /* ======================= REORDER & ALERTS TAB ======================= */
+    function setReorderStatus(msg, cls) { var el = $("r-status"); el.innerText = msg; el.className = "status-msg-bar " + (cls || ""); }
+
+    function loadAvgTable() {
+      var branch = $("r-branchSelect").value;
+      $("avgTableBody").innerHTML = '<tr><td colspan="8" style="text-align:center; color:#888; padding:15px;">Loading…</td></tr>';
+      google.script.run.withSuccessHandler(function(rows){
+        var tbody = $("avgTableBody"); tbody.innerHTML = "";
+        if (!rows || !rows.length) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#888; padding:15px;">No data yet — tap "Recalculate Avg Consumption".</td></tr>'; return; }
+        rows.forEach(function(r){
+          var tr = document.createElement('tr');
+          if (r.status === 'REORDER') tr.className = 'mismatch';
+          var statusClass = 'status-' + r.status;
+          tr.innerHTML = '<td>' + r.branch + '</td><td>' + r.item + '</td><td>' + r.current + '</td><td>' + r.minStock + '</td><td>' + r.avgDaily + '</td><td>' + r.daysLeft + '</td><td><span class="status-pill ' + statusClass + '">' + r.status + '</span></td><td style="font-size:11px;color:#999;">' + r.lastCalculated + '</td>';
+          tbody.appendChild(tr);
+        });
+      }).withFailureHandler(function(e){ setReorderStatus("Error: " + e.message, "error"); }).getAvgConsumptionData(branch === 'ALL' ? 'ALL' : branch);
+    }
+
+    function recalcAvg() {
+      setReorderStatus("Recalculating…", "");
+      google.script.run.withSuccessHandler(function(res){ setReorderStatus(res.message, !res.success); loadAvgTable(); })
+        .withFailureHandler(function(e){ setReorderStatus("Error: " + e.message, "error"); }).dashboardRecalcAvgConsumption();
+    }
+    function checkAlertsNow() {
+      setReorderStatus("Checking Min Stock and sending WhatsApp alerts…", "");
+      google.script.run.withSuccessHandler(function(res){ setReorderStatus(res.message, !res.success); })
+        .withFailureHandler(function(e){ setReorderStatus("Error: " + e.message, "error"); }).dashboardCheckAlertsNow();
+    }
+    function sendMorningSummaryNow() {
+      setReorderStatus("Sending morning summary…", "");
+      google.script.run.withSuccessHandler(function(res){ setReorderStatus(res.message, !res.success); })
+        .withFailureHandler(function(e){ setReorderStatus("Error: " + e.message, "error"); }).dashboardSendMorningSummaryNow();
+    }
+
+    google.script.run.withSuccessHandler(function(res){
+      var el = $("whatsappConfigHint");
+      if (res.ready) el.textContent = 'WhatsApp (WATI) config looks ready.';
+      else {
+        var missing = [];
+        if (!res.endpointOk) missing.push('endpoint'); if (!res.tokenOk) missing.push('access token'); if (!res.templateOk) missing.push('template name');
+        el.textContent = 'WhatsApp (WATI) config incomplete: fill in ' + missing.join(', ') + ' in the WhatsApp_Config sheet.';
+      }
+    }).dashboardWhatsAppConfigStatus();
+
+    /* ======================= GODOWN TAB ======================= */
+    var godownListCache = [];
+
+    function loadGodownList() {
+      $("godown-list").innerHTML = '<div style="text-align:center; color:#888; padding:15px; font-size:13px;">Loading stock list...</div>';
+      setStatus("Fetching live godown stock...", "");
+      google.script.run.withSuccessHandler(function(data){
+        godownListCache = data || []; renderGodownList(godownListCache);
+        setStatus("Godown list updated. " + godownListCache.length + " items.", "success");
+      }).withFailureHandler(function(e){ setStatus("Error: " + e.message, "error"); }).getStockListWeb();
+    }
+
+    function filterGodownList(query) {
+      var q = (query || "").trim().toLowerCase();
+      if (!q) { renderGodownList(godownListCache); return; }
+      renderGodownList(godownListCache.filter(function(item){ return (item.name && item.name.toLowerCase().indexOf(q) !== -1) || (item.barcode && String(item.barcode).toLowerCase().indexOf(q) !== -1) || (item.category && item.category.toLowerCase().indexOf(q) !== -1); }));
+    }
+
+    function renderGodownList(list) {
+      var box = $("godown-list");
+      if (!list || list.length === 0) { box.innerHTML = '<div style="text-align:center; color:#888; padding:15px; font-size:13px; grid-column:1/-1;">No items found.</div>'; return; }
+      var html = "";
+      for (var i = 0; i < list.length; i++) {
+        var item = list[i]; var lowFlag = item.stock <= 0;
+        html += `<div class="history-row stock-row" onclick="showItemHistory('${item.barcode}', '${item.name.replace(/'/g, "\\'")}')"><div class="history-left"><strong style="color:var(--text); font-size:14px;">${item.name}</strong><span style="color:var(--text-soft); font-size:11px;">Code: ${item.barcode} | ${item.category}</span></div><div class="history-right"><span class="stock-badge${lowFlag ? ' low' : ''}">${item.stock}</span><span class="chevron-icon">›</span></div></div>`;
+      }
+      box.innerHTML = html;
+    }
+
+    function showItemHistory(barcode, name) {
+      $("godown-list-view").style.display = "none";
+      $("godown-history-view").style.display = "flex";
+      var matched = godownListCache.find(function(it){ return it.barcode === barcode; });
+      var currentStock = matched ? matched.stock : "—", category = matched ? matched.category : "";
+      $("history-item-header").innerHTML = `<strong>${name}</strong><span>Code: ${barcode} | ${category}</span><span style="font-size:13.5px; color:var(--navy); font-weight:700; margin-top:4px;">Godown Current Stock: ${currentStock}</span>`;
+      $("history-list").innerHTML = '<div style="text-align:center; color:#888; padding:15px; font-size:13px;">Loading history...</div>';
+      setStatus("Fetching item history...", "");
+      google.script.run.withSuccessHandler(function(data){ renderItemHistory(data || []); setStatus("History loaded for " + name + ".", "success"); })
+        .withFailureHandler(function(e){ $("history-list").innerHTML = '<div style="text-align:center; color:#888; padding:15px; font-size:13px;">Could not load history.</div>'; })
+        .getItemHistoryWeb(barcode, name);
+    }
+
+    function renderItemHistory(historyList) {
+      var box = $("history-list");
+      if (!historyList || historyList.length === 0) { box.innerHTML = '<div style="text-align:center; color:#888; padding:15px; font-size:13px;">No PRODUCTION/DISPATCH transactions recorded yet for this item (branch POS sales appear in the Sales tab instead).</div>'; return; }
+      var html = "";
+      for (var i = 0; i < historyList.length; i++) {
+        var txn = historyList[i];
+        var cls = txn.type === "PRODUCTION" ? "prod" : (txn.type === "DISPATCH" ? "disp" : "sale");
+        var icon = txn.type === "PRODUCTION" ? "⬆ PRODUCTION" : (txn.type === "DISPATCH" ? "⬇ DISPATCH" : "🛍️ SALE");
+        var sign = txn.type === "PRODUCTION" ? "+" : "-";
+        var branchLine = txn.branch ? (" | Branch: " + txn.branch) : "";
+        var valueLine = txn.value ? (" | ₹" + Number(txn.value).toLocaleString('en-IN')) : "";
+        html += `<div class="txn-row"><div class="txn-left"><span class="txn-type-tag ${cls}">${icon}</span><span style="color:var(--text-soft); font-size:11px;">${txn.timestamp}${branchLine}${valueLine}</span></div><span class="txn-qty-change ${cls}">${sign}${txn.qty}</span></div>`;
+      }
+      box.innerHTML = html;
+    }
+
+    function backToGodownList() { $("godown-history-view").style.display = "none"; $("godown-list-view").style.display = "block"; }
+
+    /* ======================= RECORDS TAB ======================= */
+    var currentRecordsSheet = 'invlog';
+    function switchRecordsSheet(sheetKey) {
+      currentRecordsSheet = sheetKey;
+      ["invlog","verify","stockdash"].forEach(function(k){ $("rec-tab-" + k).classList.toggle("active", k === sheetKey); });
+      $("rec-type-filter").style.display = sheetKey === 'invlog' ? "block" : "none";
+      $("records-list").innerHTML = "Filters set — tap \"Load Records\" to view.";
+    }
+
+    function loadRecordsData() {
+      var location = $("rec-location-filter").value, search = $("rec-search-input").value, type = $("rec-type-filter").value;
+      $("records-list").innerHTML = '<div style="text-align:center; color:#888; padding:15px; font-size:13px;">Loading...</div>';
+      setStatus("Loading records...", "");
+
+      if (currentRecordsSheet === 'invlog') {
+        google.script.run.withSuccessHandler(function(data){ renderInventoryLogRecords(data || []); setStatus("Loaded " + (data ? data.length : 0) + " rows.", "success"); })
+          .withFailureHandler(function(e){ setStatus("Error: " + e.message, "error"); }).getInventoryLogRawWeb({ type: type, branch: location === "All" ? "" : location, search: search });
+      } else if (currentRecordsSheet === 'verify') {
+        google.script.run.withSuccessHandler(function(data){ renderVerifyRecords(data || []); setStatus("Loaded " + (data ? data.length : 0) + " rows.", "success"); })
+          .withFailureHandler(function(e){ setStatus("Error: " + e.message, "error"); }).getVerificationRawWeb({ branch: location === "All" ? "" : location, search: search });
+      } else {
+        google.script.run.withSuccessHandler(function(data){ renderStockDashboardRecords(data || []); setStatus("Loaded " + (data ? data.length : 0) + " rows.", "success"); })
+          .withFailureHandler(function(e){ setStatus("Error: " + e.message, "error"); }).getStockDashboardRawWeb({ location: location, search: search });
+      }
+    }
+
+    function renderInventoryLogRecords(rows) {
+      var box = $("records-list");
+      if (!rows || rows.length === 0) { box.innerHTML = '<div style="text-align:center; color:#888; padding:15px; font-size:13px;">No matching rows.</div>'; return; }
+      var html = "";
+      rows.forEach(function(r){
+        var cls = r.type === "PRODUCTION" ? "prod" : (r.type === "DISPATCH" ? "disp" : "sale");
+        var recTag = r.receivedStatus === "Pending" ? ' <span style="color:var(--terracotta); font-weight:700;">(Pending)</span>' : (r.receivedStatus === "Received" ? ' <span style="color:var(--green); font-weight:700;">(Received)</span>' : '');
+        html += `<div class="txn-row"><div class="txn-left"><span class="txn-type-tag ${cls}">${r.type}</span><span style="color:var(--text-soft); font-size:11px;">${r.timestamp} | ${r.product}${r.branch ? ' | ' + r.branch : ''}${recTag}</span></div><span class="txn-qty-change ${cls}">${r.qty}</span></div>`;
+      });
+      box.innerHTML = html;
+    }
+
+    function renderVerifyRecords(rows) {
+      var box = $("records-list");
+      if (!rows || rows.length === 0) { box.innerHTML = '<div style="text-align:center; color:#888; padding:15px; font-size:13px;">No matching rows.</div>'; return; }
+      var html = "";
+      rows.forEach(function(r){
+        var statusClass = 'status-' + String(r.status).replace(/ /g, '-');
+        html += `<div class="dash-row"><div class="dash-row-top"><span class="dash-row-name">${r.item}</span><span class="dash-row-loc">${r.branch}</span></div><div class="dash-row-figs"><span>${r.date}</span><span>Opening: <b>${r.opening === '' ? '—' : r.opening}</b></span><span>Dispatch: <b>${r.dispatch}</b></span><span>Sales: <b>${r.sales}</b></span><span>Expected: <b>${r.expected}</b></span><span>Actual: <b>${r.actual === '' ? '—' : r.actual}</b></span><span class="status-pill ${statusClass}">${r.status}</span></div></div>`;
+      });
+      box.innerHTML = html;
+    }
+
+    function renderStockDashboardRecords(rows) {
+      var box = $("records-list");
+      if (!rows || rows.length === 0) { box.innerHTML = '<div style="text-align:center; color:#888; padding:15px; font-size:13px;">No matching rows.</div>'; return; }
+      var html = "";
+      rows.forEach(function(r){
+        html += `<div class="dash-row"><div class="dash-row-top"><span class="dash-row-name">${r.product}</span><span class="dash-row-loc">${r.location}</span></div><div class="dash-row-figs"><span>${r.date}</span><span>${r.category || '—'}</span><span>Opening: <b>${r.opening}</b></span><span>In: <b>${r.stockIn}</b></span><span>Sales/Out: <b>${r.salesOrOut}</b></span><span>Current: <b>${r.current}</b></span></div></div>`;
+      });
+      box.innerHTML = html;
+    }
+
+    /* ======================= LINKS TAB ======================= */
+    var cachedAppUrl = null;
+    function withAppUrl(cb) {
+      if (cachedAppUrl !== null) { cb(cachedAppUrl); return; }
+      google.script.run.withSuccessHandler(function(url){ cachedAppUrl = url || window.location.href.split('?')[0]; cb(cachedAppUrl); })
+        .withFailureHandler(function(){ cachedAppUrl = window.location.href.split('?')[0]; cb(cachedAppUrl); }).getAppUrlWeb();
+    }
+
+    function renderBranchDashboardLinksList() {
+      withAppUrl(function(base){
+        var box = $("branch-dashboard-links-list");
+        var html = "";
+        BRANCHES.forEach(function(loc){
+          var link = base + "?page=branch&branch=" + encodeURIComponent(loc);
+          html += '<div><b>' + loc + ':</b> <a href="' + link + '" target="_blank" style="color:var(--navy);">' + link + '</a></div>';
+        });
+        box.innerHTML = html;
+      });
+    }
+
+    function loadCategoryLinks() {
+      var box = $("category-links-list");
+      box.innerHTML = "Loading categories...";
+      google.script.run.withSuccessHandler(function(cats){
+        withAppUrl(function(base){
+          if (cats && cats.length > 0) {
+            var html = "";
+            cats.forEach(function(cat){
+              var link = base + "?page=production&category=" + encodeURIComponent(cat);
+              html += '<div><b>' + cat + ':</b> <a href="' + link + '" target="_blank" style="color:var(--navy);">' + link + '</a></div>';
+            });
+            box.innerHTML = html;
+            categoryLinksLoaded = true;
+          } else box.innerHTML = '<div style="color:#888;">No categories found in Master.</div>';
+        });
+      }).withFailureHandler(function(e){ box.innerHTML = '<div style="color:#888;">Could not load categories.</div>'; }).getCategoriesWeb();
+    }
+
+    function renderProductionDeskLink() {
+      withAppUrl(function(base){
+        var link = base + "?page=production";
+        $("production-desk-link").innerHTML = '<a href="' + link + '" target="_blank" style="color:var(--navy); font-weight:700;">' + link + '</a>';
+      });
+    }
+
+    /* ======================= ADMIN TAB ======================= */
+    function setAdminStatus(msg, isError) { var el = $("admin-status"); el.textContent = msg; el.className = "status-msg-bar " + (isError ? "error" : "success"); }
+
+    function dashboardRunYesterdayNow() {
+      setAdminStatus("Running… this can take a bit for large sheets.", false);
+      google.script.run.withSuccessHandler(function(res){ setAdminStatus(res.message, !res.success); if (res.success) { $("v-dateSelect").value = res.date; loadVerifyData(res.date); } })
+        .withFailureHandler(function(e){ setAdminStatus("Error: " + e.message, true); }).dashboardRunYesterday();
+    }
+    function setupAllTriggersNow() {
+      setAdminStatus("Setting up triggers…", false);
+      google.script.run.withSuccessHandler(function(res){ setAdminStatus(res.message, !res.success); loadTriggerStatus(); })
+        .withFailureHandler(function(e){ setAdminStatus("Error: " + e.message, true); }).setupAllTriggers();
+    }
+    function refreshProductCacheNow() {
+      setAdminStatus("Refreshing product cache…", false);
+      google.script.run.withSuccessHandler(function(){ setAdminStatus("Product cache refreshed.", false); })
+        .withFailureHandler(function(e){ setAdminStatus("Error: " + e.message, true); }).refreshProductCache_();
+    }
+    function recalcSnapshotNow() {
+      setAdminStatus("Recalculating live snapshot…", false);
+      google.script.run.withSuccessHandler(function(res){ setAdminStatus(res.success ? ("Snapshot refreshed — " + res.itemCount + " rows.") : ("Error: " + res.error), !res.success); })
+        .withFailureHandler(function(e){ setAdminStatus("Error: " + e.message, true); }).recalculateSnapshotsToSheet();
+    }
+
+    function loadTriggerStatus() {
+      google.script.run.withSuccessHandler(function(res){
+        $("trigger-status-hint").textContent = "Nightly verification: " + (res.nightlyActive ? "active" : "not set") +
+          " | Morning WhatsApp summary: " + (res.morningActive ? "active" : "not set") +
+          " | Live snapshot (5 min): " + (res.snapshotActive ? "active" : "not set");
+      }).dashboardTriggerStatus();
+    }
+
+    function loadDiagnostics() {
+      google.script.run.withSuccessHandler(function(d){
+        $("diag-content").innerHTML =
+          'Master rows: <b>' + d.masterRows + '</b> &nbsp;|&nbsp; ' +
+          'Inventory Log rows: <b>' + d.inventoryLogRows + '</b> &nbsp;|&nbsp; ' +
+          'Stock Verification rows: <b>' + d.verificationRows + '</b> &nbsp;|&nbsp; ' +
+          'Sales months available: <b>' + (d.salesMonthsAvailable || []).join(", ") + '</b><br>' +
+          'Recipes (FG count): <b>' + d.recipeFGCount + '</b> &nbsp;|&nbsp; ' +
+          'IMS materials: <b>' + d.imsMaterialRows + '</b> &nbsp;|&nbsp; ' +
+          'Item Name Correction rows: <b>' + d.itemNameCorrectionRows + '</b> &nbsp;|&nbsp; ' +
+          'Timezone: <b>' + d.scriptTimeZone + '</b>' +
+          (d.masterRows === 0 ? '<br><br>⚠ Master sheet has 0 rows — fill in Barcode/Item Name/Category/Unit/Sale_Rate/Cost_Rate.' : '') +
+          (d.inventoryLogRows === 0 ? '<br>⚠ Inventory Log has 0 rows — Savali Factory stock will show nothing until scans/manual entries are recorded via the Production/Dispatch Desk.' : '');
+      }).withFailureHandler(function(e){ $("diag-content").innerText = "System status error: " + e.message; }).getSystemStatusWeb();
+    }
+
+    window.addEventListener('DOMContentLoaded', function () {
+      var todayStr = new Date().toISOString().slice(0,10);
+      var yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+      $("dash-date-input").value = yesterday.toISOString().slice(0,10);
+      $("dash-month-input").value = todayStr.slice(0,7);
+      initVerify();
+      loadStockDashboard();
+      loadDiagnostics();
+      loadValuationCategories();
+      loadTriggerStatus();
+    });
+  </script>
+</body>
+</html>
