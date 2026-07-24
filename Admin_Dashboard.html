@@ -164,16 +164,13 @@
   <div class="wrap">
     <header>
       <h1>Raghuvir Sweets & Bakers</h1>
-      <p>Admin Dashboard — Verification, Live Stock, Valuation, Reorder &amp; Sales</p>
+      <p>Admin Dashboard — Verification, Live Stock &amp; Sales</p>
     </header>
 
     <div class="top-tab-row">
       <button class="top-tab-btn active" id="top-tab-verify" type="button" onclick="switchTopTab('verify')">Verification</button>
       <button class="top-tab-btn" id="top-tab-stock" type="button" onclick="switchTopTab('stock')">Stock</button>
-      <button class="top-tab-btn" id="top-tab-valuation" type="button" onclick="switchTopTab('valuation')">Valuation</button>
-      <button class="top-tab-btn" id="top-tab-branchstock" type="button" onclick="switchTopTab('branchstock')">Branch Stock</button>
       <button class="top-tab-btn" id="top-tab-sales" type="button" onclick="switchTopTab('sales')">Sales (POS)</button>
-      <button class="top-tab-btn" id="top-tab-reorder" type="button" onclick="switchTopTab('reorder')">Reorder &amp; Alerts</button>
       <button class="top-tab-btn" id="top-tab-godown" type="button" onclick="switchTopTab('godown')">Godown</button>
       <button class="top-tab-btn" id="top-tab-records" type="button" onclick="switchTopTab('records')">Records</button>
       <button class="top-tab-btn" id="top-tab-links" type="button" onclick="switchTopTab('links')">Links</button>
@@ -184,7 +181,7 @@
     <div class="panel" id="view-verify">
       <div class="panel-head">✅ Daily Closing Stock Verification</div>
       <div class="panel-body">
-        <p style="font-size:12px; color:var(--text-soft); margin:0;">Expected Closing = Opening Stock (yesterday's closing) + Dispatch Received (today) − Sales Sold (today), compared against the Actual Closing your branch staff enter on the <b>Ram Mandir / Vishrambagh / Miraj</b> sheet tabs. This Actual Closing is also what powers the Stock &amp; Valuation tabs' "Opening Stock" figure — there's no separate opening-stock entry step anymore.</p>
+        <p style="font-size:12px; color:var(--text-soft); margin:0;">Expected Closing = Opening Stock (yesterday's closing) + Dispatch Received (today) − Sales Sold (today), compared against the Actual Closing your branch staff enter on the <b>Ram Mandir / Vishrambagh / Miraj</b> sheet tabs. This Actual Closing is also what powers the Stock tab's "Opening Stock" figure — there's no separate opening-stock entry step anymore.</p>
         <div class="filter-row">
           <select id="v-branchSelect" class="filter-select"><option value="ALL">All Branches</option></select>
           <input type="date" id="v-dateSelect" class="filter-input">
@@ -243,48 +240,6 @@
       </div>
     </div>
 
-    <!-- =============== VALUATION =============== -->
-    <div class="panel" id="view-valuation" hidden>
-      <div class="panel-head">💰 Current Stock Valuation — Item Wise</div>
-      <div class="panel-body">
-        <div class="filter-row">
-          <select id="val-location-filter" class="filter-select">
-            <option value="All">All Locations</option><option value="Savali Factory">Savali Factory</option>
-            <option value="Ram Mandir">Ram Mandir</option><option value="Vishrambagh">Vishrambagh</option><option value="Miraj">Miraj</option>
-          </select>
-          <select id="val-category-filter" class="filter-select"><option value="All">All Categories</option></select>
-        </div>
-        <div class="filter-row">
-          <input id="val-search-input" class="filter-input search-input" type="text" placeholder="Search product name...">
-          <button class="master-btn" type="button" style="flex:1 1 160px;" onclick="loadValuation()">🔄 Load Valuation</button>
-        </div>
-        <div id="valuation-grand-total" class="grand-total-card" style="display:none;">
-          <div class="label">Total Stock Value</div><div class="value" id="valuation-grand-value">₹0</div>
-        </div>
-        <label class="history-section-label">Item Wise Valuation</label>
-        <div id="valuation-items-list" class="scroll-box grid-box">Choose filters above and tap "Load Valuation".</div>
-      </div>
-    </div>
-
-    <!-- =============== BRANCH STOCK =============== -->
-    <div class="panel" id="view-branchstock" hidden>
-      <div class="panel-head">📦 Branch Current Stock</div>
-      <div class="panel-body">
-        <p style="font-size:12px; color:var(--text-soft); margin:0;">Only the 3 outlets — Savali Factory's stock is shown in the <a href="javascript:void(0)" onclick="switchTopTab('godown')" style="color:var(--navy); font-weight:700;">Godown</a> tab.</p>
-        <div class="filter-row">
-          <select id="branchstock-location-filter" class="filter-select">
-            <option value="All Branches">All Branches</option><option value="Ram Mandir">Ram Mandir</option><option value="Vishrambagh">Vishrambagh</option><option value="Miraj">Miraj</option>
-          </select>
-        </div>
-        <div class="filter-row">
-          <input id="branchstock-search-input" class="filter-input search-input" type="text" placeholder="Search product name...">
-          <button class="master-btn" type="button" style="flex:1 1 160px;" onclick="loadBranchStock()">🔄 Load Current Stock</button>
-        </div>
-        <label class="history-section-label">Current Stock (yesterday's closing, or estimate)</label>
-        <div id="branchstock-results-list" class="scroll-box grid-box">Choose filters above and tap "Load Current Stock".</div>
-      </div>
-    </div>
-
     <!-- =============== SALES DATA (POS) =============== -->
     <div class="panel" id="view-sales" hidden>
       <div class="panel-head">🛍️ Sales Data (from POS export)</div>
@@ -296,31 +251,6 @@
         <div class="two-col">
           <div><label class="history-section-label">By Location</label><div id="sales-by-location" class="scroll-box" style="max-height:260px;">Pick a month and tap "Load Sales Summary".</div></div>
           <div><label class="history-section-label">Top 50 Products (by sales value)</label><div id="sales-top-products" class="scroll-box" style="max-height:400px;"></div></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- =============== REORDER & ALERTS (Bakery avg-consumption + WhatsApp) =============== -->
-    <div class="panel" id="view-reorder" hidden>
-      <div class="panel-head">🔔 Reorder Status &amp; WhatsApp Alerts</div>
-      <div class="panel-body">
-        <div class="filter-row">
-          <select id="r-branchSelect" class="filter-select"><option value="ALL">All Branches</option></select>
-          <button class="master-btn" type="button" style="flex:1 1 160px;" onclick="loadAvgTable()">🔄 Load Reorder Table</button>
-        </div>
-        <div class="filter-row">
-          <button class="master-btn" type="button" id="recalcAvgBtn" onclick="recalcAvg()">↻ Recalculate Avg Consumption</button>
-          <button class="master-btn" type="button" id="checkAlertsBtn" onclick="checkAlertsNow()">📲 Check Min Stock &amp; Send Alerts</button>
-          <button class="master-btn" type="button" id="morningSummaryBtn" onclick="sendMorningSummaryNow()">🌅 Send Morning Summary Now</button>
-        </div>
-        <div id="r-status" class="status-msg-bar"></div>
-        <div id="whatsappConfigHint" class="history-section-label" style="text-transform:none; letter-spacing:0; color:var(--text-soft);">WhatsApp (WATI) config status: checking…</div>
-        <label class="history-section-label">Low Stock / Reorder Status</label>
-        <div class="table-wrap">
-          <table class="verify-table" id="avgTable">
-            <thead><tr><th>Branch</th><th>Item</th><th>Current Stock</th><th>Min Stock</th><th>Avg Daily (7d)</th><th>Days Left</th><th>Status</th><th>Last Calculated</th></tr></thead>
-            <tbody id="avgTableBody"><tr><td colspan="8" style="text-align:center; color:#888; padding:15px;">Tap "Load Reorder Table".</td></tr></tbody>
-          </table>
         </div>
       </div>
     </div>
@@ -421,7 +351,7 @@
     // ⚠️ EDIT THIS — paste your deployed Apps Script Web App URL (ends in /exec).
     // Deploy: Apps Script editor → Deploy → New deployment → Web app → Execute as Me,
     // Access: Anyone. Copy the resulting URL here.
-    var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz4pGQOzclbNHHKBiyuMlNieshbBYCUII2zqnVL_spnEJ93Dg0rnCcCi7JkEvFRjwNYVA/exec';
+    var APPS_SCRIPT_URL = 'PASTE_YOUR_DEPLOYED_WEB_APP_EXEC_URL_HERE';
     // ============================================================================
     //
     // This page is hosted outside Apps Script (e.g. GitHub Pages), so it can't use
@@ -516,14 +446,13 @@
 
     var categoryLinksLoaded = false;
     function switchTopTab(tab) {
-      ["verify","stock","valuation","branchstock","sales","reorder","godown","records","links","admin"].forEach(function(t){
+      ["verify","stock","sales","godown","records","links","admin"].forEach(function(t){
         $("top-tab-" + t).classList.toggle("active", t === tab);
         $("view-" + t).hidden = (t !== tab);
       });
       if (tab === 'sales' && $("sales-month-filter").options.length <= 1) loadSalesMonths();
       if (tab === 'godown' && !godownListCache.length) loadGodownList();
       if (tab === 'links' && !categoryLinksLoaded) { loadCategoryLinks(); renderBranchDashboardLinksList(); renderProductionDeskLink(); }
-      if (tab === 'reorder') { loadAvgTable(); }
     }
 
     /* ======================= VERIFICATION TAB ======================= */
@@ -549,8 +478,6 @@
       google.script.run.withSuccessHandler(function(branches){
         var sel = $("v-branchSelect");
         branches.forEach(function(b){ var opt = document.createElement("option"); opt.value = b; opt.textContent = b; sel.appendChild(opt); });
-        var rsel = $("r-branchSelect");
-        branches.forEach(function(b){ var opt = document.createElement("option"); opt.value = b; opt.textContent = b; rsel.appendChild(opt); });
       }).getBranchList();
 
       google.script.run.withSuccessHandler(function(dates){
@@ -695,71 +622,6 @@
       $("dashboard-total-value").innerText = "₹" + (data.totalValue || 0).toLocaleString('en-IN');
     }
 
-    function loadBranchStock() {
-      var location = $("branchstock-location-filter").value;
-      var search = $("branchstock-search-input").value;
-      var yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
-      var periodValue = yesterday.toISOString().slice(0, 10);
-
-      setStatus("Computing current stock...", "");
-      $("branchstock-results-list").innerHTML = '<div style="text-align:center; color:#888; padding:15px; font-size:13px;">Loading...</div>';
-
-      google.script.run
-        .withSuccessHandler(function(data){ renderBranchStock(data.rows || []); setStatus("Current stock loaded — " + (data.rows ? data.rows.length : 0) + " item(s).", "success"); })
-        .withFailureHandler(function(e){ setStatus("Error: " + e.message, "error"); })
-        .getStockDashboardWeb({ location: location, periodType: "day", periodValue: periodValue, search: search });
-    }
-
-    function renderBranchStock(rows) {
-      var box = $("branchstock-results-list");
-      if (!rows || rows.length === 0) { box.innerHTML = '<div style="text-align:center; color:#888; padding:15px; font-size:13px; grid-column:1/-1;">No stock activity found.</div>'; return; }
-      var byLocation = {};
-      rows.forEach(function(r){ (byLocation[r.location] = byLocation[r.location] || []).push(r); });
-      var locationsPresent = BRANCH_ORDER.filter(function(l){ return byLocation[l]; });
-      var html = "";
-      locationsPresent.forEach(function(loc){
-        var locRows = byLocation[loc];
-        html += `<div class="location-group-header"><span>${loc}</span><span class="lgh-value">${locRows.length} item${locRows.length > 1 ? 's' : ''}</span></div>`;
-        locRows.forEach(function(r){
-          var estFlag = !r.hasActualClosing ? '<div class="dash-row-info">ℹ Estimate — no closing entry yet</div>' : '';
-          html += `<div class="dash-row"><div class="dash-row-top"><span class="dash-row-name">${r.product}</span><span class="dash-row-loc">${r.category || '—'}</span></div><div class="dash-row-figs"><span>Current Stock: <b>${r.current} ${r.unit}</b></span></div>${estFlag}</div>`;
-        });
-      });
-      box.innerHTML = html;
-    }
-
-    function loadValuation() {
-      var location = $("val-location-filter").value, category = $("val-category-filter").value, search = $("val-search-input").value;
-      setStatus("Computing valuation...", "");
-      $("valuation-items-list").innerHTML = '<div style="text-align:center; color:#888; padding:15px; font-size:13px;">Loading...</div>';
-
-      google.script.run
-        .withSuccessHandler(function(data){ renderValuation(data); setStatus("Valuation loaded.", "success"); })
-        .withFailureHandler(function(e){ setStatus("Error: " + e.message, "error"); })
-        .getValuationWeb({ location: location, category: category, search: search });
-    }
-
-    function renderValuation(data) {
-      $("valuation-grand-total").style.display = "block";
-      $("valuation-grand-value").innerText = "₹" + (data.grandSaleValue || 0).toLocaleString('en-IN');
-      var box = $("valuation-items-list");
-      var items = data.items || [];
-      if (items.length === 0) { box.innerHTML = '<div style="text-align:center; color:#888; padding:15px; font-size:13px; grid-column:1/-1;">No stock found for these filters.</div>'; return; }
-      var html = "";
-      items.forEach(function(it){
-        html += `<div class="val-item-row"><div class="val-item-top"><span class="val-item-name">${it.product}</span><span class="val-item-loc">${it.location}</span></div><div class="val-item-figs"><span>Category: <b>${it.category || '—'}</b></span><span>Remaining Stock: <b>${it.stock} ${it.unit}</b></span></div><div class="val-item-value">Stock Value: ₹${it.saleValue.toLocaleString('en-IN')} &nbsp;(${it.stock} ${it.unit} × ₹${it.rate}/${it.unit})</div></div>`;
-      });
-      box.innerHTML = html;
-    }
-
-    function loadValuationCategories() {
-      google.script.run.withSuccessHandler(function(cats){
-        var select = $("val-category-filter");
-        select.innerHTML = '<option value="All">All Categories</option>';
-        (cats || []).forEach(function(cat){ var opt = document.createElement("option"); opt.value = cat; opt.innerText = cat; select.appendChild(opt); });
-      }).getCategoriesWeb();
-    }
-
     /* ======================= SALES (POS) TAB ======================= */
     function loadSalesMonths() {
       google.script.run.withSuccessHandler(function(months){
@@ -804,51 +666,6 @@
       products.forEach(function(p, idx){ phtml += `<div class="top-product-row"><span><span class="top-product-rank">#${idx+1}</span>${p.product}</span><span>Qty: ${p.qty} | <b>₹${p.amount.toLocaleString('en-IN')}</b></span></div>`; });
       prodBox.innerHTML = phtml;
     }
-
-    /* ======================= REORDER & ALERTS TAB ======================= */
-    function setReorderStatus(msg, cls) { var el = $("r-status"); el.innerText = msg; el.className = "status-msg-bar " + (cls || ""); }
-
-    function loadAvgTable() {
-      var branch = $("r-branchSelect").value;
-      $("avgTableBody").innerHTML = '<tr><td colspan="8" style="text-align:center; color:#888; padding:15px;">Loading…</td></tr>';
-      google.script.run.withSuccessHandler(function(rows){
-        var tbody = $("avgTableBody"); tbody.innerHTML = "";
-        if (!rows || !rows.length) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#888; padding:15px;">No data yet — tap "Recalculate Avg Consumption".</td></tr>'; return; }
-        rows.forEach(function(r){
-          var tr = document.createElement('tr');
-          if (r.status === 'REORDER') tr.className = 'mismatch';
-          var statusClass = 'status-' + r.status;
-          tr.innerHTML = '<td>' + r.branch + '</td><td>' + r.item + '</td><td>' + r.current + '</td><td>' + r.minStock + '</td><td>' + r.avgDaily + '</td><td>' + r.daysLeft + '</td><td><span class="status-pill ' + statusClass + '">' + r.status + '</span></td><td style="font-size:11px;color:#999;">' + r.lastCalculated + '</td>';
-          tbody.appendChild(tr);
-        });
-      }).withFailureHandler(function(e){ setReorderStatus("Error: " + e.message, "error"); }).getAvgConsumptionData(branch === 'ALL' ? 'ALL' : branch);
-    }
-
-    function recalcAvg() {
-      setReorderStatus("Recalculating…", "");
-      google.script.run.withSuccessHandler(function(res){ setReorderStatus(res.message, !res.success); loadAvgTable(); })
-        .withFailureHandler(function(e){ setReorderStatus("Error: " + e.message, "error"); }).dashboardRecalcAvgConsumption();
-    }
-    function checkAlertsNow() {
-      setReorderStatus("Checking Min Stock and sending WhatsApp alerts…", "");
-      google.script.run.withSuccessHandler(function(res){ setReorderStatus(res.message, !res.success); })
-        .withFailureHandler(function(e){ setReorderStatus("Error: " + e.message, "error"); }).dashboardCheckAlertsNow();
-    }
-    function sendMorningSummaryNow() {
-      setReorderStatus("Sending morning summary…", "");
-      google.script.run.withSuccessHandler(function(res){ setReorderStatus(res.message, !res.success); })
-        .withFailureHandler(function(e){ setReorderStatus("Error: " + e.message, "error"); }).dashboardSendMorningSummaryNow();
-    }
-
-    google.script.run.withSuccessHandler(function(res){
-      var el = $("whatsappConfigHint");
-      if (res.ready) el.textContent = 'WhatsApp (WATI) config looks ready.';
-      else {
-        var missing = [];
-        if (!res.endpointOk) missing.push('endpoint'); if (!res.tokenOk) missing.push('access token'); if (!res.templateOk) missing.push('template name');
-        el.textContent = 'WhatsApp (WATI) config incomplete: fill in ' + missing.join(', ') + ' in the WhatsApp_Config sheet.';
-      }
-    }).dashboardWhatsAppConfigStatus();
 
     /* ======================= GODOWN TAB ======================= */
     var godownListCache = [];
@@ -1070,7 +887,6 @@
       initVerify();
       loadStockDashboard();
       loadDiagnostics();
-      loadValuationCategories();
       loadTriggerStatus();
     });
   </script>
