@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Raghuvir Sweets & Bakers — Branch Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght=600&family=Inter:wght=400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#F3EDE2; --surface:#FFFFFF; --text:#261E16; --text-soft:#706254; --border:#DFD2BF;
+      --navy:#2C4A5E; --navy-soft:#DCE6EA; --gold:#96731E; --gold-soft:#F3E7C9;
+      --green:#3D5E26; --green-soft:#DFE8D5; --terracotta:#A63C19; --terracotta-soft:#F5DFD6;
+      --radius:16px;
+    }
+    *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    html,body{ margin:0; background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; }
+    .wrap{ width:100%; max-width:720px; margin:0 auto; padding:16px 14px 48px; }
+
+    header{ text-align:center; margin-bottom:14px; }
+    header h1{ font-family:'Fraunces',serif; font-size:clamp(20px,4vw,26px); font-weight:600; margin:0; color:var(--text); }
+    header p{ margin:3px 0 0; font-size:13px; color:var(--text-soft); font-weight:500; }
+    .branch-tag{ display:inline-block; margin-top:8px; font-size:13px; font-weight:700; color:var(--navy); background:var(--navy-soft); padding:6px 14px; border-radius:8px; }
+
+    .notify-banner{
+      display:none; align-items:center; gap:10px; background:var(--terracotta); color:#fff;
+      border-radius:14px; padding:14px 16px; margin:16px 0; font-weight:700; font-size:14px;
+      box-shadow:0 6px 16px rgba(166,60,25,0.25);
+    }
+    .notify-banner .bell{ font-size:20px; }
+
+    .top-tab-row{ display:flex; gap:8px; margin-bottom:14px; }
+    .top-tab-btn{
+      flex:1; padding:12px 4px; border-radius:12px; font-size:13px; font-weight:700;
+      font-family:inherit; cursor:pointer; border:2px solid var(--navy); background:#fff; color:var(--navy);
+    }
+    .top-tab-btn.active{ background:var(--navy); color:#fff; }
+
+    .panel{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; box-shadow:0 6px 20px rgba(0,0,0,0.04); }
+    .panel-head{ display:flex; align-items:center; justify-content:space-between; padding:14px 16px; font-family:'Fraunces',serif; font-size:17px; font-weight:600; border-bottom:1px solid var(--border); background:var(--gold-soft); color:var(--gold); }
+    .panel-body{ padding:16px; display:flex; flex-direction:column; gap:12px; }
+
+    .batch-card{ border:1px solid var(--border); border-radius:12px; padding:0; background:#FFFFFF; display:flex; flex-direction:column; overflow:hidden; }
+    .batch-card.received{ border-color:var(--green); }
+    .challan-header{ background:var(--gold-soft); padding:12px 14px; border-bottom:1px dashed var(--border); }
+    .challan-brand{ font-family:'Fraunces',serif; font-size:14px; font-weight:600; color:var(--gold); text-align:center; margin-bottom:2px; }
+    .challan-title{ font-size:10.5px; font-weight:700; letter-spacing:0.06em; color:var(--text-soft); text-align:center; text-transform:uppercase; margin-bottom:8px; }
+    .challan-meta-row{ display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px; font-size:12px; }
+    .challan-meta-row span b{ color:var(--text); }
+    .challan-table{ padding:10px 14px; }
+    .challan-table-head{ display:flex; font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.03em; color:var(--text-soft); border-bottom:1px solid var(--border); padding-bottom:6px; margin-bottom:2px; }
+    .challan-col-num{ width:24px; }
+    .challan-col-item{ flex:1; }
+    .challan-col-cat{ width:90px; }
+    .challan-col-qty{ width:50px; text-align:right; }
+    .batch-item-row{ display:flex; align-items:center; font-size:13px; padding:7px 0; border-bottom:1px dashed var(--border); }
+    .batch-item-row:last-child{ border-bottom:none; }
+    .batch-item-row .challan-col-qty{ font-weight:700; color:var(--gold); }
+    .challan-footer{ padding:10px 14px; background:#FAF7F2; border-top:1px dashed var(--border); display:flex; justify-content:space-between; align-items:center; font-size:12.5px; font-weight:700; color:var(--text); }
+    .batch-card-actions{ padding:14px; }
+    .receive-btn{
+      width:100%; padding:13px; border:none; border-radius:10px; font-size:14.5px; font-weight:700;
+      font-family:inherit; cursor:pointer; background:var(--green); color:#fff; box-shadow:0 4px 12px rgba(0,0,0,0.08);
+    }
+    .receive-btn:active{ opacity:0.9; transform:translateY(1px); }
+    .received-tag{ font-size:12px; font-weight:700; color:var(--green); background:var(--green-soft); padding:4px 10px; border-radius:6px; }
+
+    .status-msg-bar{ min-height:18px; font-size:13px; font-weight:600; text-align:center; margin-top:10px; }
+    .status-msg-bar.success{ color:var(--green); }
+    .status-msg-bar.error{ color:var(--terracotta); }
+    .empty-note{ text-align:center; color:#888; padding:20px; font-size:13px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Raghuvir Sweets & Bakers</h1>
+        <p>Branch Dashboard</p>
+      </div>
+      <div class="branch-tag" id="branch-name-tag">Loading branch...</div>
+    </header>
+
+    <div id="notify-banner" class="notify-banner">
+      <span class="bell">🔔</span>
+      <span id="notify-text">You have dispatched items waiting to be received!</span>
+    </div>
+
+    <div class="top-tab-row">
+      <button class="top-tab-btn active" id="tab-btn-pending" type="button" onclick="switchBranchTab('pending')">Dispatched</button>
+      <button class="top-tab-btn" id="tab-btn-history" type="button" onclick="switchBranchTab('history')">Received History</button>
+    </div>
+
+    <div class="panel" id="view-pending">
+      <div class="panel-head">
+        <span>📦 Dispatched</span>
+        <button class="top-tab-btn" style="flex:none; padding:8px 12px; font-size:12px;" type="button" onclick="loadPendingDispatches()">🔄 Refresh</button>
+      </div>
+      <div class="panel-body" id="pending-list">Loading...</div>
+    </div>
+
+    <div class="panel" id="view-history" hidden>
+      <div class="panel-head">
+        <span>✅ Received History</span>
+        <button class="top-tab-btn" style="flex:none; padding:8px 12px; font-size:12px;" type="button" onclick="loadReceivedHistory()">🔄 Refresh</button>
+      </div>
+      <div class="panel-body" id="history-list">Loading...</div>
+    </div>
+
+    <div id="global-status" class="status-msg-bar"></div>
+  </div>
+
+  <script>
+    function $(id){ return document.getElementById(id); }
+
+    var urlParams = new URLSearchParams(window.location.search);
+    var branchName = urlParams.get('branch') || "";
+    var VALID_BRANCHES = ["Ram Mandir", "Vishrambagh", "Miraj"]; // must match Code.gs BRANCHES exactly
+
+    function setStatus(msg, cls) { var bar = $("global-status"); bar.innerText = msg; bar.className = "status-msg-bar " + (cls || ""); }
+
+    function switchBranchTab(tab) {
+      $("tab-btn-pending").classList.toggle("active", tab === "pending");
+      $("tab-btn-history").classList.toggle("active", tab === "history");
+      $("view-pending").hidden = (tab !== "pending");
+      $("view-history").hidden = (tab !== "history");
+      if (tab === "history") loadReceivedHistory();
+    }
+
+    function loadPendingDispatches() {
+      $("pending-list").innerHTML = '<div class="empty-note">Loading dispatched items...</div>';
+      google.script.run
+        .withSuccessHandler(function(data){ renderPendingList(data || []); })
+        .withFailureHandler(function(e){ $("pending-list").innerHTML = '<div class="empty-note">Failed to load dispatched items.</div>'; })
+        .getPendingDispatchesForBranchWeb(branchName);
+    }
+
+    function renderPendingList(batches) {
+      var box = $("pending-list");
+      var banner = $("notify-banner");
+      if (!batches || batches.length === 0) { box.innerHTML = '<div class="empty-note">No dispatched items right now — you\'re all caught up!</div>'; banner.style.display = "none"; return; }
+
+      banner.style.display = "flex";
+      $("notify-text").innerText = "You have " + batches.length + " dispatch" + (batches.length > 1 ? "es" : "") + " waiting to be received!";
+
+      var html = "";
+      batches.forEach(function(batch){
+        var itemsHtml = "";
+        batch.items.forEach(function(it, idx){
+          itemsHtml += `<div class="batch-item-row"><span class="challan-col-num">${idx + 1}</span><span class="challan-col-item">${it.product}</span><span class="challan-col-cat">${it.category || '-'}</span><span class="challan-col-qty">x${it.qty}</span></div>`;
+        });
+        html += `
+          <div class="batch-card">
+            <div class="challan-header">
+              <div class="challan-brand">Raghuvir Sweets & Bakers</div>
+              <div class="challan-title">Dispatch Challan</div>
+              <div class="challan-meta-row"><span>From: <b>Savali Factory</b></span><span>To: <b>${branchName}</b></span></div>
+              <div class="challan-meta-row" style="margin-top:4px;"><span>🕐 <b>${batch.timestampDisplay}</b></span><span>${batch.items.length} item(s)</span></div>
+            </div>
+            <div class="challan-table">
+              <div class="challan-table-head"><span class="challan-col-num">#</span><span class="challan-col-item">Item Name</span><span class="challan-col-cat">Category</span><span class="challan-col-qty">Qty</span></div>
+              ${itemsHtml}
+            </div>
+            <div class="challan-footer"><span>Total Items</span><span>${batch.items.length}</span></div>
+            <div class="batch-card-actions"><button class="receive-btn" type="button" onclick="markReceived('${batch.timestampISO}', this)">✅ Mark as Received</button></div>
+          </div>`;
+      });
+      box.innerHTML = html;
+    }
+
+    function markReceived(timestampISO, btnEl) {
+      if (!confirm("Confirm you've physically received this dispatch? This will add it to your branch stock.")) return;
+      btnEl.disabled = true;
+      btnEl.innerText = "Marking as received...";
+      setStatus("Updating stock...", "");
+
+      google.script.run
+        .withSuccessHandler(function(res){
+          if (res && res.success) { setStatus(res.itemsMarkedReceived + " item(s) marked as received. Stock updated!", "success"); loadPendingDispatches(); }
+          else { setStatus("Failed to mark as received: " + (res && res.error ? res.error : "unknown error"), "error"); btnEl.disabled = false; btnEl.innerText = "✅ Mark as Received"; }
+        })
+        .withFailureHandler(function(e){ setStatus("Error: " + e.message, "error"); btnEl.disabled = false; btnEl.innerText = "✅ Mark as Received"; })
+        .markDispatchBatchReceivedWeb(branchName, timestampISO);
+    }
+
+    function loadReceivedHistory() {
+      $("history-list").innerHTML = '<div class="empty-note">Loading history...</div>';
+      google.script.run
+        .withSuccessHandler(function(data){ renderHistoryList(data || []); })
+        .withFailureHandler(function(e){ $("history-list").innerHTML = '<div class="empty-note">Failed to load history.</div>'; })
+        .getReceivedHistoryForBranchWeb(branchName);
+    }
+
+    function renderHistoryList(batches) {
+      var box = $("history-list");
+      if (!batches || batches.length === 0) { box.innerHTML = '<div class="empty-note">No received dispatches yet.</div>'; return; }
+      var html = "";
+      batches.forEach(function(batch){
+        var itemsHtml = "";
+        batch.items.forEach(function(it, idx){
+          itemsHtml += `<div class="batch-item-row"><span class="challan-col-num">${idx + 1}</span><span class="challan-col-item">${it.product}</span><span class="challan-col-cat">${it.category || '-'}</span><span class="challan-col-qty">x${it.qty}</span></div>`;
+        });
+        html += `
+          <div class="batch-card received">
+            <div class="challan-header">
+              <div class="challan-brand">Raghuvir Sweets & Bakers</div>
+              <div class="challan-title">Dispatch Challan</div>
+              <div class="challan-meta-row"><span>From: <b>Savali Factory</b></span><span>To: <b>${branchName}</b></span></div>
+              <div class="challan-meta-row" style="margin-top:4px;"><span>🕐 Sent: <b>${batch.timestampDisplay}</b></span><span class="received-tag">✅ Received</span></div>
+              <div class="challan-meta-row" style="margin-top:4px;"><span>Received at: <b>${batch.receivedAtDisplay || '—'}</b></span></div>
+            </div>
+            <div class="challan-table">
+              <div class="challan-table-head"><span class="challan-col-num">#</span><span class="challan-col-item">Item Name</span><span class="challan-col-cat">Category</span><span class="challan-col-qty">Qty</span></div>
+              ${itemsHtml}
+            </div>
+            <div class="challan-footer"><span>Total Items</span><span>${batch.items.length}</span></div>
+          </div>`;
+      });
+      box.innerHTML = html;
+    }
+
+    window.addEventListener('DOMContentLoaded', function () {
+      var matched = VALID_BRANCHES.find(function(b){ return b.toLowerCase() === branchName.toLowerCase(); });
+      if (!matched) {
+        $("branch-name-tag").innerText = "⚠ No valid branch specified in link";
+        $("pending-list").innerHTML = '<div class="empty-note">This link is missing a valid ?branch= parameter. Ask your admin for the correct branch dashboard link (see the Links tab in the Admin Dashboard).</div>';
+        return;
+      }
+      branchName = matched;
+      $("branch-name-tag").innerText = "📍 " + branchName;
+      loadPendingDispatches();
+    });
+  </script>
+</body>
+</html>
