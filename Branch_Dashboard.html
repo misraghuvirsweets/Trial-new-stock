@@ -4,195 +4,72 @@
   <base target="_top">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Raghuvir Sweets & Bakers — Production &amp; Dispatch Desk</title>
+  <title>Raghuvir Sweets & Bakers — Branch Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght=600&family=Inter:wght=400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root{
       --bg:#F3EDE2; --surface:#FFFFFF; --text:#261E16; --text-soft:#706254; --border:#DFD2BF;
+      --navy:#2C4A5E; --navy-soft:#DCE6EA; --gold:#96731E; --gold-soft:#F3E7C9;
       --green:#3D5E26; --green-soft:#DFE8D5; --terracotta:#A63C19; --terracotta-soft:#F5DFD6;
-      --navy:#2C4A5E; --navy-soft:#DCE6EA; --radius:16px;
+      --radius:16px;
     }
     *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
     html,body{ margin:0; background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; }
-    .wrap{ width:100%; max-width:560px; margin:0 auto; padding:18px 14px 40px; }
-    @media (min-width:900px){ .wrap{ max-width:640px; padding-top:36px; } }
+    .wrap{ width:100%; max-width:720px; margin:0 auto; padding:16px 14px 48px; }
 
     header{ text-align:center; margin-bottom:14px; }
     header h1{ font-family:'Fraunces',serif; font-size:clamp(20px,4vw,26px); font-weight:600; margin:0; color:var(--text); }
-    header p{ margin:3px 0 0; font-size:13px; color:var(--text-soft); font-weight: 500; }
-    .nav-links{ text-align:center; margin-top:8px; }
-    .nav-links a{ font-size:12.5px; font-weight:700; color:var(--navy); text-decoration:none; background:var(--navy-soft); padding:7px 12px; border-radius:8px; }
+    header p{ margin:3px 0 0; font-size:13px; color:var(--text-soft); font-weight:500; }
+    .branch-tag{ display:inline-block; margin-top:8px; font-size:13px; font-weight:700; color:var(--navy); background:var(--navy-soft); padding:6px 14px; border-radius:8px; }
 
-    #menu-screen{ display:flex; flex-direction:column; gap:12px; margin-top:10px; }
-    #menu-top-row{ display:flex; gap:12px; flex-wrap:wrap; }
-    .menu-btn{
-      display:flex; flex-direction:column; align-items:center; justify-content:center;
-      padding:26px 10px; border:none; border-radius:var(--radius); cursor:pointer; color:#fff; flex:1 1 200px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.06); transition: all 0.2s;
+    .notify-banner{
+      display:none; align-items:center; gap:10px; background:var(--terracotta); color:#fff;
+      border-radius:14px; padding:14px 16px; margin:16px 0; font-weight:700; font-size:14px;
+      box-shadow:0 6px 16px rgba(166,60,25,0.25);
     }
-    .menu-btn.inward{ background:var(--green); }
-    .menu-btn.outward{ background:var(--terracotta); }
-    .menu-btn:active{ transform: scale(0.97); opacity:0.95; }
-    .menu-btn-title{ font-family:'Fraunces',serif; font-size:18px; font-weight:600; }
+    .notify-banner .bell{ font-size:20px; }
 
-    .dashboard-panel{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; box-shadow:0 6px 20px rgba(0,0,0,0.04); }
-    .panel-head{ display:flex; align-items:center; gap:8px; padding:14px 16px; font-family:'Fraunces',serif; font-size:18px; font-weight:600; border-bottom:1px solid var(--border); }
-    .dashboard-panel.inward .panel-head{ background:var(--green-soft); color:var(--green); }
-    .dashboard-panel.outward .panel-head{ background:var(--terracotta-soft); color:var(--terracotta); }
-    .back-btn{ border:none; background:none; font-size:22px; cursor:pointer; color:inherit; padding:2px 8px; font-weight: bold; }
-    .panel-body{ padding:16px; display:flex; flex-direction:column; gap:14px; }
+    .top-tab-row{ display:flex; gap:8px; margin-bottom:14px; }
+    .top-tab-btn{
+      flex:1; padding:12px 4px; border-radius:12px; font-size:13px; font-weight:700;
+      font-family:inherit; cursor:pointer; border:2px solid var(--navy); background:#fff; color:var(--navy);
+    }
+    .top-tab-btn.active{ background:var(--navy); color:#fff; }
 
-    #branch-select-section{ display:none; }
-    .branch-btn-row{ display:flex; gap:8px; margin-top:6px; flex-wrap:wrap; }
-    .branch-select-btn{
-      flex:1 1 100px; padding:11px 4px; border-radius:10px; font-size:13px; font-weight:700;
-      font-family:inherit; cursor:pointer; border:2px solid var(--terracotta);
-      background:#fff; color:var(--terracotta); transition: all 0.15s;
-    }
-    .branch-select-btn.active{ background:var(--terracotta); color:#fff; }
-    .branch-select-btn:active{ transform: scale(0.96); }
-    .branch-current-tag{ font-size:12.5px; font-weight:600; color:var(--terracotta); text-align:center; margin-top:2px; }
+    .panel{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; box-shadow:0 6px 20px rgba(0,0,0,0.04); }
+    .panel-head{ display:flex; align-items:center; justify-content:space-between; padding:14px 16px; font-family:'Fraunces',serif; font-size:17px; font-weight:600; border-bottom:1px solid var(--border); background:var(--gold-soft); color:var(--gold); }
+    .panel-body{ padding:16px; display:flex; flex-direction:column; gap:12px; }
 
-    .giant-scan-box {
-      width: 100%; padding: 28px 16px; text-align: center;
-      border: 2px dashed var(--border); border-radius: 12px; cursor: pointer;
-      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
-      transition: all 0.2s; background: #fff;
-    }
-    .giant-scan-box strong { font-size: 17px; letter-spacing: 0.02em; }
-    .giant-scan-box span { font-size: 12px; opacity: 0.8; }
-    .dashboard-panel.inward .giant-scan-box { color: var(--green); border-color: var(--green); background: var(--green-soft); }
-    .dashboard-panel.outward .giant-scan-box { color: var(--terracotta); border-color: var(--terracotta); background: var(--terracotta-soft); }
-    .giant-scan-box:active { transform: scale(0.96); }
-    .giant-scan-box.disabled { opacity: 0.45; pointer-events: none; }
-
-    .manual-entry-btn {
-      width: 100%; padding: 14px 16px; text-align: center; margin-top: 4px;
-      border: 2px dashed var(--border); border-radius: 12px; cursor: pointer;
-      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
-      background: #FAF7F2; color: var(--text-soft); font-family: inherit; transition: all 0.2s;
-    }
-    .manual-entry-btn strong{ font-size: 14px; color: var(--text); }
-    .manual-entry-btn span{ font-size: 11.5px; }
-    .manual-entry-btn:active{ transform: scale(0.97); }
-    .manual-entry-btn.disabled { opacity: 0.45; pointer-events: none; }
-
-    #manual-entry-panel{ display:none; flex-direction:column; gap:12px; }
-    .manual-form-row{ display:flex; gap:8px; flex-wrap:wrap; }
-    .manual-form-select, .manual-form-input{
-      flex:1 1 160px; padding:11px 12px; border:1px solid var(--border); border-radius:10px;
-      font-size:14px; font-family:inherit; background:#fff; color:var(--text); outline:none;
-    }
-    .manual-items-grid{
-      display:grid; grid-template-columns:1fr; gap:10px; max-height:420px; overflow-y:auto;
-      border:1px solid var(--border); border-radius:12px; background:#FAF7F2; padding:10px;
-    }
-    @media (min-width:640px){ .manual-items-grid{ grid-template-columns:repeat(2,1fr); } }
-    .manual-item-card{ background:#fff; border:1px solid var(--border); border-radius:10px; padding:10px 12px; display:flex; flex-direction:column; gap:6px; }
-    .manual-item-name{ font-weight:700; font-size:13.5px; color:var(--text); }
-    .manual-item-meta{ font-size:11px; color:var(--text-soft); }
-    .manual-item-qty-row{ display:flex; align-items:center; gap:8px; margin-top:2px; }
-    .manual-item-qty-row label{ font-size:11px; color:var(--text-soft); font-weight:700; }
-    .manual-item-qty-input{
-      flex:1; padding:8px 10px; border:1px solid var(--border); border-radius:8px;
-      font-size:14px; font-family:inherit; text-align:right; outline:none;
-    }
-    .manual-item-qty-input.touched{ background:#F2E8DB; }
-    .dashboard-panel.inward .manual-item-qty-input.touched{ border-color:var(--green); }
-    .dashboard-panel.outward .manual-item-qty-input.touched{ border-color:var(--terracotta); }
-    .manual-summary-bar{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; background:var(--navy-soft); border-radius:10px; padding:11px 14px; font-size:12.5px; font-weight:700; color:var(--navy); }
-    .manual-secondary-btn{
-      width:100%; padding:13px; border:none; border-radius:10px; font-size:14px; font-weight:700;
-      font-family:inherit; cursor:pointer; background:#EFE9DE; color:var(--text);
-    }
-    .manual-secondary-btn:active{ opacity:0.9; }
-
-    .history-section-label { display:block; font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-soft); font-weight:700; margin-top: 4px; }
-    .history-scroll-box {
-      border: 1px solid var(--border); border-radius: 12px; background: #FAF7F2;
-      max-height: 300px; overflow-y: auto; padding: 2px 12px;
-    }
-    .history-row { display: flex; justify-content: space-between; align-items: center; font-size: 13.5px; padding: 11px 0; border-bottom: 1px dashed var(--border); gap:8px; }
-    .history-row:last-child { border-bottom: none; }
-    .history-left { display: flex; flex-direction: column; gap: 2px; min-width:0; }
-    .history-right { display: flex; align-items: center; gap: 12px; flex-shrink:0; }
-
-    .history-delete-btn {
-      background: #F2E8DB; border: none; color: #9E2F11; font-size: 13px;
-      font-weight: 700; cursor: pointer; width: 26px; height: 26px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center; transition: all 0.15s;
-    }
-    .history-delete-btn:active { background: #E5D6C3; transform: scale(0.88); }
-
-    .master-submit-btn {
-      width: 100%; padding: 15px; border: none; border-radius: 10px;
-      font-size: 15px; font-weight: 700; font-family: inherit; color: #fff;
-      cursor: pointer; background: #261E16; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    .master-submit-btn:active { opacity: 0.92; transform: translateY(1px); }
-
-    .status-msg-bar{ min-height:18px; font-size:13px; font-weight: 600; text-align: center; }
-    .status-msg-bar.success{ color:var(--green); }
-    .status-msg-bar.error{ color:var(--terracotta); }
-
-    #scanner-modal{ position:fixed; inset:0; background:#000; z-index:9999; display:none; }
-    #scanner-modal.active{ display:block; }
-    #scanner-viewport{ position:absolute; inset:0; overflow:hidden; }
-    #scanner-viewport video, #scanner-viewport canvas{ position:absolute; inset:0; width:100% !important; height:100% !important; object-fit:cover; }
-    .scanner-topbar{ position:absolute; top:0; left:0; right:0; z-index:3; display:flex; align-items:center; justify-content:space-between; padding:16px; background:linear-gradient(to bottom, rgba(0,0,0,0.5), transparent); }
-    .scanner-cancel-action{ background:rgba(255,255,255,0.25); color:#fff; border:none; border-radius:8px; padding:8px 14px; font-weight:600; font-size:13px; cursor:pointer; }
-    .scanner-guide-box{
-      position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:min(82%,420px); height:130px;
-      border:3px solid #528A33; border-radius:14px; box-shadow:0 0 0 2000px rgba(0,0,0,0.55); z-index:2; pointer-events:none;
-    }
-    .scanner-guide-box::after{ content:""; position:absolute; left:2%; right:2%; height:3px; background:#528A33; box-shadow:0 0 8px #528A33; top:10%; animation:laserline 1.2s ease-in-out infinite; }
-    @keyframes laserline{ 0% { top:10%; } 50% { top:90%; } 100% { top:10%; } }
-
-    .dashboard-popup-backdrop {
-      position: fixed; inset: 0; background: rgba(20, 16, 12, 0.45); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-      z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 16px;
-      opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
-    }
-    .dashboard-popup-backdrop.open { opacity: 1; pointer-events: auto; }
-    .dashboard-popup-card {
-      background: #FFFFFF; border: 1px solid var(--border); width: 100%; max-width: 360px;
-      border-radius: 20px; padding: 22px; box-shadow: 0 20px 45px rgba(0,0,0,0.2);
-      transform: scale(0.92); transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.15);
-    }
-    .dashboard-popup-backdrop.open .dashboard-popup-card { transform: scale(1); }
-    .popup-item-title { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 600; color: var(--text); margin: 0 0 4px 0; text-align: center; }
-    .popup-item-category { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-soft); text-align: center; font-weight: 700; margin-bottom: 18px; }
-    .popup-input-container { background: #FCFAF6; border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin-bottom: 16px; }
-    .popup-input-container label { display: block; font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--text-soft); text-align: center; margin-bottom: 4px; }
-    .popup-input-field { width: 100%; padding: 4px; font-size: 26px; font-weight: 700; border: none; background: transparent; text-align: center; color: var(--text); outline: none; font-family: inherit; }
-    .popup-action-column { display: flex; flex-direction: column; gap: 10px; }
-    .popup-action-row-top { display: flex; gap: 10px; }
-    .popup-action-btn { padding: 13px; border: none; border-radius: 10px; font-size: 14.5px; font-weight: 700; cursor: pointer; font-family: inherit; text-align: center; }
-    .popup-action-btn.cancel { flex: 1; background: #EFE9DE; color: var(--text); }
-    .popup-action-btn.add-next { flex: 1; background: #261E16; color: #fff; }
-    .popup-action-btn.done { width: 100%; background: #3D5E26; color: #fff; }
-
-    .challan-preview-card{ max-width:420px; max-height:85vh; overflow-y:auto; padding:0; }
-    .challan-header{ background:#F3E7C9; padding:16px 18px 14px; border-radius:20px 20px 0 0; }
-    .challan-brand{ font-family:'Fraunces',serif; font-size:16px; font-weight:600; color:#96731E; text-align:center; margin-bottom:2px; }
-    .challan-title{ font-size:10.5px; font-weight:700; letter-spacing:0.06em; color:var(--text-soft); text-align:center; text-transform:uppercase; margin-bottom:10px; }
+    .batch-card{ border:1px solid var(--border); border-radius:12px; padding:0; background:#FFFFFF; display:flex; flex-direction:column; overflow:hidden; }
+    .batch-card.received{ border-color:var(--green); }
+    .challan-header{ background:var(--gold-soft); padding:12px 14px; border-bottom:1px dashed var(--border); }
+    .challan-brand{ font-family:'Fraunces',serif; font-size:14px; font-weight:600; color:var(--gold); text-align:center; margin-bottom:2px; }
+    .challan-title{ font-size:10.5px; font-weight:700; letter-spacing:0.06em; color:var(--text-soft); text-align:center; text-transform:uppercase; margin-bottom:8px; }
     .challan-meta-row{ display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px; font-size:12px; }
     .challan-meta-row span b{ color:var(--text); }
-    .challan-table{ padding:12px 18px; }
+    .challan-table{ padding:10px 14px; }
     .challan-table-head{ display:flex; font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.03em; color:var(--text-soft); border-bottom:1px solid var(--border); padding-bottom:6px; margin-bottom:2px; }
-    .challan-col-num{ width:22px; }
-    .challan-col-item{ flex:1; padding-right:6px; }
-    .challan-col-cat{ width:80px; font-size:11.5px; }
-    .challan-col-qty{ width:44px; text-align:right; }
-    .challan-item-row{ display:flex; align-items:center; font-size:13px; padding:7px 0; border-bottom:1px dashed var(--border); }
-    .challan-item-row:last-child{ border-bottom:none; }
-    .challan-item-row .challan-col-qty{ font-weight:700; color:#96731E; }
-    .challan-footer{ padding:10px 18px; background:#FAF7F2; display:flex; justify-content:space-between; align-items:center; font-size:12.5px; font-weight:700; color:var(--text); }
-    .challan-note{ font-size:11px; color:var(--text-soft); text-align:center; padding:10px 18px 0; }
-    .challan-actions{ padding:16px 18px 18px; display:flex; flex-direction:column; gap:10px; }
-    .challan-download-btn{ width:100%; padding:14px; border:none; border-radius:10px; font-size:14.5px; font-weight:700; font-family:inherit; cursor:pointer; background:#96731E; color:#fff; }
-    .challan-close-btn{ width:100%; padding:13px; border:none; border-radius:10px; font-size:14px; font-weight:700; font-family:inherit; cursor:pointer; background:#EFE9DE; color:var(--text); }
+    .challan-col-num{ width:24px; }
+    .challan-col-item{ flex:1; }
+    .challan-col-cat{ width:90px; }
+    .challan-col-qty{ width:50px; text-align:right; }
+    .batch-item-row{ display:flex; align-items:center; font-size:13px; padding:7px 0; border-bottom:1px dashed var(--border); }
+    .batch-item-row:last-child{ border-bottom:none; }
+    .batch-item-row .challan-col-qty{ font-weight:700; color:var(--gold); }
+    .challan-footer{ padding:10px 14px; background:#FAF7F2; border-top:1px dashed var(--border); display:flex; justify-content:space-between; align-items:center; font-size:12.5px; font-weight:700; color:var(--text); }
+    .batch-card-actions{ padding:14px; }
+    .receive-btn{
+      width:100%; padding:13px; border:none; border-radius:10px; font-size:14.5px; font-weight:700;
+      font-family:inherit; cursor:pointer; background:var(--green); color:#fff; box-shadow:0 4px 12px rgba(0,0,0,0.08);
+    }
+    .receive-btn:active{ opacity:0.9; transform:translateY(1px); }
+    .received-tag{ font-size:12px; font-weight:700; color:var(--green); background:var(--green-soft); padding:4px 10px; border-radius:6px; }
+
+    .status-msg-bar{ min-height:18px; font-size:13px; font-weight:600; text-align:center; margin-top:10px; }
+    .status-msg-bar.success{ color:var(--green); }
+    .status-msg-bar.error{ color:var(--terracotta); }
+    .empty-note{ text-align:center; color:#888; padding:20px; font-size:13px; }
   </style>
 </head>
 <body>
@@ -200,589 +77,250 @@
     <header>
       <div>
         <h1>Raghuvir Sweets & Bakers</h1>
-        <p>Production &amp; Dispatch Desk</p>
+        <p>Branch Dashboard</p>
       </div>
+      <div class="branch-tag" id="branch-name-tag">Loading branch...</div>
     </header>
 
-    <div id="menu-screen">
-      <div id="menu-top-row">
-        <button class="menu-btn inward" type="button" onclick="openDashboardScreen('in')">
-          <span class="menu-btn-title">Production (PROD)</span>
-        </button>
-        <button class="menu-btn outward" type="button" onclick="openDashboardScreen('out')">
-          <span class="menu-btn-title">Dispatch (DISP)</span>
-        </button>
-      </div>
+    <div id="notify-banner" class="notify-banner">
+      <span class="bell">🔔</span>
+      <span id="notify-text">You have dispatched items waiting to be received!</span>
     </div>
 
-    <div id="desk-dashboard" class="dashboard-panel" hidden>
+    <div class="top-tab-row">
+      <button class="top-tab-btn active" id="tab-btn-pending" type="button" onclick="switchBranchTab('pending')">Dispatched</button>
+      <button class="top-tab-btn" id="tab-btn-history" type="button" onclick="switchBranchTab('history')">Received History</button>
+    </div>
+
+    <div class="panel" id="view-pending">
       <div class="panel-head">
-        <button class="back-btn" type="button" onclick="exitDashboardScreen()">←</button>
-        <span id="dashboard-title-label">Dashboard Desk</span>
+        <span>📦 Dispatched</span>
+        <button class="top-tab-btn" style="flex:none; padding:8px 12px; font-size:12px;" type="button" onclick="loadPendingDispatches()">🔄 Refresh</button>
       </div>
-
-      <div class="panel-body">
-        <div id="branch-select-section">
-          <label class="history-section-label">Select Dispatch Branch</label>
-          <div class="branch-btn-row" id="branch-btn-row"></div>
-          <div id="branch-current-tag" class="branch-current-tag"></div>
-        </div>
-
-        <div id="scan-box-wrapper" class="giant-scan-box" onclick="triggerLiveScanner()">
-          <strong>⚡ TAP TO SCAN BARCODE</strong>
-          <span>Camera viewfinder opens automatically</span>
-        </div>
-
-        <div id="manual-entry-btn" class="manual-entry-btn" onclick="openManualEntryPanel()">
-          <strong>✍️ Manual Entry (No Barcode)</strong>
-          <span>Pick a category, enter quantities for multiple items at once</span>
-        </div>
-
-        <div id="manual-entry-panel">
-          <div class="manual-form-row">
-            <select id="manual-category-select" class="manual-form-select" onchange="loadManualItemsForCategory()">
-              <option value="">Loading categories...</option>
-            </select>
-            <div id="manual-category-locked-tag" style="display:none; font-size:12.5px; font-weight:700; color:var(--text); background:#F2E8DB; padding:11px 14px; border-radius:10px; flex:1 1 160px;"></div>
-          </div>
-          <input id="manual-item-search" class="manual-form-input" type="text" placeholder="Search within loaded items..." oninput="filterManualVisibleItems(this.value)" style="width:100%;">
-
-          <div id="manual-summary-bar" class="manual-summary-bar" style="display:none;">
-            <span id="manual-summary-text">0 items loaded</span>
-            <span id="manual-summary-touched">0 entered</span>
-          </div>
-
-          <div id="manual-items-grid" class="manual-items-grid">Pick a category above to load its items.</div>
-
-          <button class="master-submit-btn" type="button" onclick="addManualItemsToBatch()">➕ Add Entered Items to Batch</button>
-          <button class="manual-secondary-btn" type="button" onclick="closeManualEntryPanel()">← Back to Scan</button>
-        </div>
-
-        <div style="margin-top: 2px;">
-          <label class="history-section-label">Scanned Items History Log</label>
-          <div id="dashboard-history-scroll" class="history-scroll-box">No entries in batch yet.</div>
-        </div>
-
-        <button class="master-submit-btn" type="button" onclick="submitEntireDeskBatch()">🚀 Confirm &amp; Final Submit Batch</button>
-
-        <div id="dashboard-status-log" class="status-msg-bar"></div>
-      </div>
+      <div class="panel-body" id="pending-list">Loading...</div>
     </div>
+
+    <div class="panel" id="view-history" hidden>
+      <div class="panel-head">
+        <span>✅ Received History</span>
+        <button class="top-tab-btn" style="flex:none; padding:8px 12px; font-size:12px;" type="button" onclick="loadReceivedHistory()">🔄 Refresh</button>
+      </div>
+      <div class="panel-body" id="history-list">Loading...</div>
+    </div>
+
+    <div id="global-status" class="status-msg-bar"></div>
   </div>
 
-  <div id="scanner-modal">
-    <div id="scanner-viewport"></div>
-    <div class="scanner-topbar">
-      <span style="color:#fff; font-size:15px; font-weight:600;">Scanning Active Grid...</span>
-      <button class="scanner-cancel-action" type="button" onclick="terminateLiveScanner()">✕ Close</button>
-    </div>
-    <div class="scanner-guide-box"></div>
-  </div>
-
-  <div id="dashboard-popup-backdrop" class="dashboard-popup-backdrop">
-    <div class="dashboard-popup-card">
-      <h3 id="pop-product-name" class="popup-item-title">Product Description</h3>
-      <div id="pop-product-cat" class="popup-item-category">Bakery</div>
-      <div class="popup-input-container">
-        <label>Enter Quantity Count</label>
-        <input id="pop-qty-input" class="popup-input-field" type="number" step="any" value="1">
-      </div>
-      <div class="popup-action-column">
-        <div class="popup-action-row-top">
-          <button class="popup-action-btn cancel" type="button" onclick="closeDashboardPopupCard('cancel')">Cancel</button>
-          <button class="popup-action-btn add-next" type="button" onclick="closeDashboardPopupCard('add_next')">➕ ADD & NEXT SCAN</button>
-        </div>
-        <button class="popup-action-btn done" type="button" onclick="closeDashboardPopupCard('done')">✔️ DONE</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="challan-preview-backdrop" class="dashboard-popup-backdrop">
-    <div class="dashboard-popup-card challan-preview-card">
-      <div id="challan-preview-body"></div>
-      <div class="challan-actions">
-        <button class="challan-download-btn" type="button" onclick="downloadChallanPDF()">📥 Download as PDF</button>
-        <button class="challan-close-btn" type="button" onclick="closeChallanPreview()">Close</button>
-      </div>
-    </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2/dist/quagga.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
+    // ============================================================================
+    // ⚠️ EDIT THIS — paste your deployed Apps Script Web App URL (ends in /exec).
+    // Deploy: Apps Script editor → Deploy → New deployment → Web app → Execute as Me,
+    // Access: Anyone. Copy the resulting URL here.
+    var APPS_SCRIPT_URL = 'PASTE_YOUR_DEPLOYED_WEB_APP_EXEC_URL_HERE';
+    // ============================================================================
+    //
+    // This page is hosted outside Apps Script (e.g. GitHub Pages), so it can't use
+    // google.script.run directly — that only works for HTML served BY Apps Script.
+    // This shim recreates the same google.script.run.functionName(args)
+    //   .withSuccessHandler(fn).withFailureHandler(fn)
+    // call pattern used throughout this file, but sends each call as a JSONP
+    // request (a dynamically-inserted <script> tag) to the deployed Web App,
+    // which routes it to the real server function via ?action=functionName.
+    // JSONP is used (not fetch) because Apps Script Web App responses don't
+    // include CORS headers, so a cross-origin fetch() would be blocked by the
+    // browser — a <script> tag isn't subject to that restriction.
+    (function () {
+      var callbackCounter = 0;
+
+      function jsonpCall(functionName, args, successHandler, failureHandler) {
+        if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.indexOf('PASTE_YOUR_DEPLOYED') === 0) {
+          var msg = 'APPS_SCRIPT_URL is not set yet — paste your deployed /exec URL at the top of the <script> block.';
+          console.error(msg);
+          if (failureHandler) failureHandler({ message: msg });
+          return;
+        }
+
+        var callbackName = '__gs_cb_' + (callbackCounter++) + '_' + Date.now();
+        var script = document.createElement('script');
+
+        function cleanup() {
+          delete window[callbackName];
+          if (script.parentNode) script.parentNode.removeChild(script);
+        }
+
+        window[callbackName] = function (response) {
+          cleanup();
+          if (!response || response.__ok === false) {
+            var errMsg = (response && response.__error) || ('Unknown server error calling ' + functionName);
+            if (failureHandler) failureHandler({ message: errMsg }); else console.error(errMsg);
+            return;
+          }
+          if (successHandler) successHandler(response.result);
+        };
+
+        var url = APPS_SCRIPT_URL
+          + '?action=' + encodeURIComponent(functionName)
+          + '&callback=' + encodeURIComponent(callbackName)
+          + '&args=' + encodeURIComponent(JSON.stringify(args || []));
+
+        script.src = url;
+        script.onerror = function () {
+          cleanup();
+          if (failureHandler) failureHandler({ message: 'Network error calling ' + functionName + ' (check APPS_SCRIPT_URL and that the deployment is accessible to Anyone).' });
+        };
+        document.body.appendChild(script);
+      }
+
+      function makeRunProxy() {
+        var pendingSuccess = null;
+        var pendingFailure = null;
+
+        var proxy = new Proxy({}, {
+          get: function (target, prop) {
+            if (prop === 'withSuccessHandler') {
+              return function (fn) { pendingSuccess = fn; return proxy; };
+            }
+            if (prop === 'withFailureHandler') {
+              return function (fn) { pendingFailure = fn; return proxy; };
+            }
+            if (prop === 'withUserObject') {
+              return function () { return proxy; }; // not needed here, no-op for compatibility
+            }
+            return function () {
+              var args = Array.prototype.slice.call(arguments);
+              var s = pendingSuccess, f = pendingFailure;
+              pendingSuccess = null;
+              pendingFailure = null;
+              jsonpCall(String(prop), args, s, f);
+            };
+          }
+        });
+        return proxy;
+      }
+
+      window.google = window.google || {};
+      window.google.script = window.google.script || {};
+      window.google.script.run = makeRunProxy();
+    })();
     function $(id){ return document.getElementById(id); }
 
-    var BRANCHES = ['Ram Mandir', 'Vishrambagh', 'Miraj']; // must match Code.gs BRANCHES exactly
+    var urlParams = new URLSearchParams(window.location.search);
+    var branchName = urlParams.get('branch') || "";
+    var VALID_BRANCHES = ["Ram Mandir", "Vishrambagh", "Miraj"]; // must match Code.gs BRANCHES exactly
 
-    var currentActiveMode = null;
-    var centralBatchCollection = [];
-    var currentScannedPayload = null;
-    var selectedBranchName = null;
+    function setStatus(msg, cls) { var bar = $("global-status"); bar.innerText = msg; bar.className = "status-msg-bar " + (cls || ""); }
 
-    var urlParamsForPage = new URLSearchParams(window.location.search);
-    var manualPresetCategory = urlParamsForPage.get('category');
-    var categoryLockActive = !!manualPresetCategory;
-    var manualCategoriesLoaded = false;
-
-    // Render branch buttons once from the BRANCHES list above.
-    (function renderBranchButtons(){
-      var row = $("branch-btn-row");
-      row.innerHTML = BRANCHES.map(function(b){
-        return '<button class="branch-select-btn" type="button" data-branch="' + b + '" onclick="selectBranch(\'' + b + '\')">' + b + '</button>';
-      }).join('');
-    })();
-
-    function openDashboardScreen(mode) {
-      currentActiveMode = mode;
-      centralBatchCollection = [];
-      selectedBranchName = null;
-      $("menu-screen").hidden = true;
-      $("desk-dashboard").hidden = false;
-      $("desk-dashboard").className = "dashboard-panel " + (mode === "in" ? "inward" : "outward");
-      $("dashboard-title-label").innerText = mode === "in" ? "Production Dashboard Unit" : "Dispatch Dashboard Unit";
-
-      $("manual-entry-panel").style.display = "none";
-      $("scan-box-wrapper").style.display = "flex";
-      $("manual-entry-btn").style.display = "flex";
-
-      if (mode === "out") { $("branch-select-section").style.display = "block"; updateBranchButtonStates(); updateScanBoxLockState(); }
-      else { $("branch-select-section").style.display = "none"; updateScanBoxLockState(); }
-
-      refreshHistoryLogDisplay();
-      setLogStatus("Dashboard Workspace Initiated.", "success");
+    function switchBranchTab(tab) {
+      $("tab-btn-pending").classList.toggle("active", tab === "pending");
+      $("tab-btn-history").classList.toggle("active", tab === "history");
+      $("view-pending").hidden = (tab !== "pending");
+      $("view-history").hidden = (tab !== "history");
+      if (tab === "history") loadReceivedHistory();
     }
 
-    function exitDashboardScreen() {
-      currentActiveMode = null;
-      centralBatchCollection = [];
-      selectedBranchName = null;
-      $("desk-dashboard").hidden = true;
-      $("menu-screen").hidden = false;
-    }
-
-    function selectBranch(branchName) {
-      selectedBranchName = branchName;
-      updateBranchButtonStates();
-      updateScanBoxLockState();
-      setLogStatus("Branch set to: " + branchName, "success");
-    }
-
-    function updateBranchButtonStates() {
-      document.querySelectorAll(".branch-select-btn").forEach(function(btn){
-        btn.classList.toggle("active", btn.getAttribute("data-branch") === selectedBranchName);
-      });
-      $("branch-current-tag").innerText = selectedBranchName ? ("Selected: " + selectedBranchName) : "Please select a branch to begin scanning.";
-    }
-
-    function updateScanBoxLockState() {
-      var scanBox = $("scan-box-wrapper"), manualBtn = $("manual-entry-btn");
-      if (currentActiveMode === "out" && !selectedBranchName) { scanBox.classList.add("disabled"); manualBtn.classList.add("disabled"); }
-      else { scanBox.classList.remove("disabled"); manualBtn.classList.remove("disabled"); }
-    }
-
-    function deleteRowEntryItem(index) {
-      centralBatchCollection.splice(index, 1);
-      refreshHistoryLogDisplay();
-      setLogStatus("Selected row entry item removed successfully.", "success");
-    }
-
-    function refreshHistoryLogDisplay() {
-      var scrollBox = $("dashboard-history-scroll");
-      if (centralBatchCollection.length === 0) {
-        scrollBox.innerHTML = '<div style="text-align:center; color:#888; padding:15px; font-size:13px;">No entries logged in current batch workspace yet.</div>';
-        return;
-      }
-      var htmlRowsGrid = "";
-      for (var i = 0; i < centralBatchCollection.length; i++) {
-        var entry = centralBatchCollection[i];
-        var branchLine = entry.branch ? (" | Branch: " + entry.branch) : "";
-        htmlRowsGrid += `
-          <div class="history-row">
-            <div class="history-left">
-              <strong style="color:var(--text); font-size:14px;">${entry.product}</strong>
-              <span style="color:var(--text-soft); font-size:11px;">Code: ${entry.barcode} | ${entry.category}${branchLine}</span>
-            </div>
-            <div class="history-right">
-              <span style="font-weight:700; color:var(--text); font-size:14px; background:#F2E8DB; padding:4px 8px; border-radius:6px;">x${entry.qty}</span>
-              <button class="history-delete-btn" type="button" onclick="deleteRowEntryItem(${i})">✕</button>
-            </div>
-          </div>`;
-      }
-      scrollBox.innerHTML = htmlRowsGrid;
-    }
-
-    var scannerRunning = false;
-    var trackingSequence = [];
-    var mediaStreamInstance = null;
-    var nativeDetectorObject = null;
-    var nativeLoopActive = false;
-    var DETECT_READERS = ["code_128_reader", "ean_reader", "ean_8_reader", "upc_reader", "code_39_reader"];
-
-    function triggerLiveScanner() {
-      if (currentActiveMode === "out" && !selectedBranchName) { alert("Please select a Branch before scanning."); return; }
-      if ($("scanner-modal").classList.contains("active")) return;
-      trackingSequence = [];
-      $("scanner-modal").classList.add("active");
-      if ("BarcodeDetector" in window) startNativeCameraScanner(); else startQuaggaFallbackScanner();
-    }
-
-    async function startNativeCameraScanner() {
-      try { nativeDetectorObject = new BarcodeDetector({ formats: ["code_128","code_39","ean_13","ean_8","upc_a"] }); } catch(e){}
-      try { mediaStreamInstance = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } } }); }
-      catch (err) { startQuaggaFallbackScanner(); return; }
-
-      var liveVideo = document.createElement("video");
-      liveVideo.setAttribute("playsinline", ""); liveVideo.muted = true; liveVideo.srcObject = mediaStreamInstance;
-      $("scanner-viewport").innerHTML = ""; $("scanner-viewport").appendChild(liveVideo);
-      try { await liveVideo.play(); } catch(e){}
-
-      scannerRunning = true; nativeLoopActive = true;
-      nativeExtractionLoop(liveVideo);
-    }
-
-    async function nativeExtractionLoop(videoElement) {
-      while (nativeLoopActive) {
-        try {
-          var codesFound = await nativeDetectorObject.detect(videoElement);
-          if (codesFound && codesFound.length > 0 && codesFound[0].rawValue) {
-            var rawCode = codesFound[0].rawValue;
-            trackingSequence.push(rawCode);
-            if (trackingSequence.length > 2) trackingSequence.shift();
-            if (trackingSequence.length === 2 && trackingSequence[0] === trackingSequence[1]) { evaluateIncomingScannedCode(rawCode); return; }
-          }
-        } catch (e) {}
-        await new Promise(r => setTimeout(r, 220));
-      }
-    }
-
-    function startQuaggaFallbackScanner() {
-      Quagga.init({
-        inputStream: { name: "Live", type: "LiveStream", target: document.querySelector("#scanner-viewport"), constraints: { facingMode: "environment", width: 1280, height: 720 } },
-        locator: { patchSize: "medium", halfSample: false, area: { top: "15%", right: "5%", left: "5%", bottom: "15%" } },
-        decoder: { readers: DETECT_READERS }
-      }, function(err){ if(!err) { Quagga.start(); scannerRunning = true; } });
-      Quagga.onDetected(onQuaggaFrameHit);
-    }
-
-    function onQuaggaFrameHit(resultData) {
-      if (!scannerRunning) return;
-      var rawStringCode = resultData.codeResult.code;
-      if (!rawStringCode || rawStringCode.length < 4) return;
-      trackingSequence.push(rawStringCode);
-      if (trackingSequence.length > 2) trackingSequence.shift();
-      if (trackingSequence.length === 2 && trackingSequence[0] === trackingSequence[1]) evaluateIncomingScannedCode(rawStringCode);
-    }
-
-    function terminateLiveScanner() {
-      scannerRunning = false; nativeLoopActive = false;
-      if (mediaStreamInstance) { try { mediaStreamInstance.getTracks().forEach(t => t.stop()); } catch(e){} mediaStreamInstance = null; }
-      try { Quagga.offDetected(onQuaggaFrameHit); Quagga.stop(); } catch(e){}
-      $("scanner-modal").classList.remove("active");
-    }
-
-    function evaluateIncomingScannedCode(codeString) {
-      if (!scannerRunning) return;
-      scannerRunning = false;
-      if (navigator.vibrate) navigator.vibrate(65);
-
-      var cleanedCode = codeString.replace(/^#+/, '');
-      var parsedBarcode = cleanedCode;
-      var isolatedWeightVal = 0;
-      var isWeightScaleBarcode = false;
-
-      if (cleanedCode.length > 4) {
-        parsedBarcode = cleanedCode.substring(0, 4);
-        var subWeightStr = cleanedCode.substring(4);
-        isolatedWeightVal = parseFloat(subWeightStr) || 0;
-        if (isolatedWeightVal > 0) isWeightScaleBarcode = true;
-      }
-
-      terminateLiveScanner();
-
-      currentScannedPayload = { barcode: parsedBarcode, qty: isolatedWeightVal, isWeight: isWeightScaleBarcode, product: "Code: " + parsedBarcode, category: "Loading Details..." };
-
-      if (!isWeightScaleBarcode) {
-        $("pop-product-name").innerText = currentScannedPayload.product;
-        $("pop-product-cat").innerText = currentScannedPayload.category;
-        $("pop-qty-input").value = "1";
-        $("dashboard-popup-backdrop").classList.add("open");
-        setTimeout(() => $("pop-qty-input").focus(), 100);
-      }
-
+    function loadPendingDispatches() {
+      $("pending-list").innerHTML = '<div class="empty-note">Loading dispatched items...</div>';
       google.script.run
-        .withSuccessHandler(function(data){
-          if (data) {
-            currentScannedPayload.product = data.name;
-            currentScannedPayload.category = data.category;
-            if (isWeightScaleBarcode) { commitPayloadEntryToStaging(currentScannedPayload.qty); setTimeout(function(){ triggerLiveScanner(); }, 250); }
-            else { $("pop-product-name").innerText = data.name; $("pop-product-cat").innerText = data.category; }
-          } else {
-            if (!isWeightScaleBarcode) { $("pop-product-name").innerText = "New Item (" + parsedBarcode + ")"; $("pop-product-cat").innerText = "Not Found"; }
-            else {
-              currentScannedPayload.product = "Unknown Weight Item (" + parsedBarcode + ")";
-              currentScannedPayload.category = "Master Missing";
-              commitPayloadEntryToStaging(currentScannedPayload.qty);
-              setTimeout(function(){ triggerLiveScanner(); }, 250);
-            }
-          }
-        })
-        .withFailureHandler(function(err){ setLogStatus("Lookup error: " + err.message, "error"); })
-        .getProductDetailsWeb(parsedBarcode);
+        .withSuccessHandler(function(data){ renderPendingList(data || []); })
+        .withFailureHandler(function(e){ $("pending-list").innerHTML = '<div class="empty-note">Failed to load dispatched items.</div>'; })
+        .getPendingDispatchesForBranchWeb(branchName);
     }
 
-    function closeDashboardPopupCard(actionType) {
-      if (actionType === 'cancel') { $("dashboard-popup-backdrop").classList.remove("open"); return; }
-      var userTypedQty = parseFloat($("pop-qty-input").value);
-      if (isNaN(userTypedQty) || userTypedQty <= 0) { alert("Please enter a valid quantity amount!"); return; }
-      commitPayloadEntryToStaging(userTypedQty);
-      $("dashboard-popup-backdrop").classList.remove("open");
-      if (actionType === 'add_next') setTimeout(function(){ triggerLiveScanner(); }, 200);
-      else if (actionType === 'done') setLogStatus("Item added. Batch staging screen active.", "success");
-    }
+    function renderPendingList(batches) {
+      var box = $("pending-list");
+      var banner = $("notify-banner");
+      if (!batches || batches.length === 0) { box.innerHTML = '<div class="empty-note">No dispatched items right now — you\'re all caught up!</div>'; banner.style.display = "none"; return; }
 
-    function commitPayloadEntryToStaging(quantityToLog) {
-      var itemObject = {
-        type: (currentActiveMode === "in") ? "PRODUCTION" : "DISPATCH",
-        barcode: currentScannedPayload.barcode, category: currentScannedPayload.category, product: currentScannedPayload.product,
-        qty: quantityToLog, branch: (currentActiveMode === "out") ? selectedBranchName : ""
-      };
-      centralBatchCollection.push(itemObject);
-      refreshHistoryLogDisplay();
-      setLogStatus("Added into Workspace: " + itemObject.product, "success");
-    }
+      banner.style.display = "flex";
+      $("notify-text").innerText = "You have " + batches.length + " dispatch" + (batches.length > 1 ? "es" : "") + " waiting to be received!";
 
-    function openManualEntryPanel() {
-      if (currentActiveMode === "out" && !selectedBranchName) { alert("Please select a Branch before manual entry."); return; }
-      $("scan-box-wrapper").style.display = "none";
-      $("manual-entry-btn").style.display = "none";
-      $("manual-entry-panel").style.display = "flex";
-      if (!manualCategoriesLoaded) loadManualCategories();
-      else if (categoryLockActive) applyManualPresetCategory();
-    }
-
-    function closeManualEntryPanel() {
-      $("manual-entry-panel").style.display = "none";
-      $("scan-box-wrapper").style.display = "flex";
-      $("manual-entry-btn").style.display = "flex";
-      updateScanBoxLockState();
-    }
-
-    function loadManualCategories() {
-      google.script.run.withSuccessHandler(function(cats){
-        var select = $("manual-category-select");
-        select.innerHTML = '<option value="">Select a category...</option>';
-        if (cats && cats.length > 0) {
-          cats.forEach(function(cat){ var opt = document.createElement("option"); opt.value = cat; opt.innerText = cat; select.appendChild(opt); });
-          manualCategoriesLoaded = true;
-          if (categoryLockActive) applyManualPresetCategory();
-        } else select.innerHTML = '<option value="">No categories found</option>';
-      }).withFailureHandler(function(e){ setLogStatus("Could not load categories.", "error"); }).getCategoriesWeb();
-    }
-
-    function applyManualPresetCategory() {
-      if (!manualPresetCategory) return;
-      var select = $("manual-category-select");
-      var matched = Array.from(select.options).some(function(o){ return o.value === manualPresetCategory; });
-      if (!matched) return;
-      select.value = manualPresetCategory;
-      select.disabled = true;
-      select.style.display = "none";
-      $("manual-category-locked-tag").style.display = "block";
-      $("manual-category-locked-tag").innerText = "🔒 Locked to category: " + manualPresetCategory;
-      loadManualItemsForCategory();
-    }
-
-    function loadManualItemsForCategory() {
-      var category = $("manual-category-select").value;
-      if (!category) { $("manual-items-grid").innerHTML = "Pick a category above to load its items."; $("manual-summary-bar").style.display = "none"; return; }
-      $("manual-items-grid").innerHTML = '<div style="text-align:center; color:#888; padding:15px; font-size:13px;">Loading items...</div>';
-      setLogStatus("Loading items in " + category + "...", "");
-
-      google.script.run.withSuccessHandler(function(items){
-        renderManualItemsGrid(items || []);
-        $("manual-summary-bar").style.display = "flex";
-        updateManualSummary(items ? items.length : 0);
-        setLogStatus("Loaded " + (items ? items.length : 0) + " items in " + category + ".", "success");
-      }).withFailureHandler(function(e){ setLogStatus("Items load failed.", "error"); }).getProductsByCategoryWeb(category);
-    }
-
-    function renderManualItemsGrid(items) {
-      var box = $("manual-items-grid");
-      if (!items || items.length === 0) { box.innerHTML = '<div style="text-align:center; color:#888; padding:15px; font-size:13px;">No items in this category.</div>'; return; }
       var html = "";
-      for (var i = 0; i < items.length; i++) {
-        var it = items[i];
+      batches.forEach(function(batch){
+        var itemsHtml = "";
+        batch.items.forEach(function(it, idx){
+          itemsHtml += `<div class="batch-item-row"><span class="challan-col-num">${idx + 1}</span><span class="challan-col-item">${it.product}</span><span class="challan-col-cat">${it.category || '-'}</span><span class="challan-col-qty">x${it.qty}</span></div>`;
+        });
         html += `
-          <div class="manual-item-card" data-name="${it.name.toLowerCase()}">
-            <div class="manual-item-name">${it.name}</div>
-            <div class="manual-item-meta">Code: ${it.barcode || '—'} | Godown Stock: ${it.godownStock} ${it.unit}</div>
-            <div class="manual-item-qty-row">
-              <label>Qty</label>
-              <input class="manual-item-qty-input" type="number" step="any" placeholder="0"
-                     data-product="${it.name.replace(/"/g,'&quot;')}"
-                     data-barcode="${it.barcode || ''}"
-                     data-category="${(it.category || '').replace(/"/g,'&quot;')}"
-                     oninput="this.classList.toggle('touched', this.value !== ''); updateManualSummary();">
+          <div class="batch-card">
+            <div class="challan-header">
+              <div class="challan-brand">Raghuvir Sweets & Bakers</div>
+              <div class="challan-title">Dispatch Challan</div>
+              <div class="challan-meta-row"><span>From: <b>Savali Factory</b></span><span>To: <b>${branchName}</b></span></div>
+              <div class="challan-meta-row" style="margin-top:4px;"><span>🕐 <b>${batch.timestampDisplay}</b></span><span>${batch.items.length} item(s)</span></div>
             </div>
+            <div class="challan-table">
+              <div class="challan-table-head"><span class="challan-col-num">#</span><span class="challan-col-item">Item Name</span><span class="challan-col-cat">Category</span><span class="challan-col-qty">Qty</span></div>
+              ${itemsHtml}
+            </div>
+            <div class="challan-footer"><span>Total Items</span><span>${batch.items.length}</span></div>
+            <div class="batch-card-actions"><button class="receive-btn" type="button" onclick="markReceived('${batch.timestampISO}', this)">✅ Mark as Received</button></div>
           </div>`;
-      }
+      });
       box.innerHTML = html;
     }
 
-    function filterManualVisibleItems(query) {
-      var q = (query || "").trim().toLowerCase();
-      document.querySelectorAll("#manual-items-grid .manual-item-card").forEach(function(card){
-        var name = card.getAttribute("data-name") || "";
-        card.style.display = (!q || name.indexOf(q) !== -1) ? "flex" : "none";
-      });
+    function markReceived(timestampISO, btnEl) {
+      if (!confirm("Confirm you've physically received this dispatch? This will add it to your branch stock.")) return;
+      btnEl.disabled = true;
+      btnEl.innerText = "Marking as received...";
+      setStatus("Updating stock...", "");
+
+      google.script.run
+        .withSuccessHandler(function(res){
+          if (res && res.success) { setStatus(res.itemsMarkedReceived + " item(s) marked as received. Stock updated!", "success"); loadPendingDispatches(); }
+          else { setStatus("Failed to mark as received: " + (res && res.error ? res.error : "unknown error"), "error"); btnEl.disabled = false; btnEl.innerText = "✅ Mark as Received"; }
+        })
+        .withFailureHandler(function(e){ setStatus("Error: " + e.message, "error"); btnEl.disabled = false; btnEl.innerText = "✅ Mark as Received"; })
+        .markDispatchBatchReceivedWeb(branchName, timestampISO);
     }
 
-    function updateManualSummary(totalCount) {
-      var inputs = document.querySelectorAll("#manual-items-grid .manual-item-qty-input");
-      var touched = 0;
-      inputs.forEach(function(inp){ if (inp.value !== "") touched++; });
-      if (typeof totalCount === "number") $("manual-summary-text").innerText = totalCount + " items loaded";
-      $("manual-summary-touched").innerText = touched + " entered";
+    function loadReceivedHistory() {
+      $("history-list").innerHTML = '<div class="empty-note">Loading history...</div>';
+      google.script.run
+        .withSuccessHandler(function(data){ renderHistoryList(data || []); })
+        .withFailureHandler(function(e){ $("history-list").innerHTML = '<div class="empty-note">Failed to load history.</div>'; })
+        .getReceivedHistoryForBranchWeb(branchName);
     }
 
-    function addManualItemsToBatch() {
-      if (currentActiveMode === "out" && !selectedBranchName) { alert("Please select a Branch before adding dispatch items."); return; }
-      var inputs = document.querySelectorAll("#manual-items-grid .manual-item-qty-input");
-      var addedCount = 0;
-      inputs.forEach(function(inp){
-        if (inp.value === "") return;
-        var qty = parseFloat(inp.value);
-        if (isNaN(qty) || qty <= 0) return;
-        centralBatchCollection.push({
-          type: (currentActiveMode === "in") ? "PRODUCTION" : "DISPATCH",
-          barcode: inp.getAttribute("data-barcode"), category: inp.getAttribute("data-category"), product: inp.getAttribute("data-product"),
-          qty: qty, branch: (currentActiveMode === "out") ? selectedBranchName : ""
+    function renderHistoryList(batches) {
+      var box = $("history-list");
+      if (!batches || batches.length === 0) { box.innerHTML = '<div class="empty-note">No received dispatches yet.</div>'; return; }
+      var html = "";
+      batches.forEach(function(batch){
+        var itemsHtml = "";
+        batch.items.forEach(function(it, idx){
+          itemsHtml += `<div class="batch-item-row"><span class="challan-col-num">${idx + 1}</span><span class="challan-col-item">${it.product}</span><span class="challan-col-cat">${it.category || '-'}</span><span class="challan-col-qty">x${it.qty}</span></div>`;
         });
-        addedCount++;
+        html += `
+          <div class="batch-card received">
+            <div class="challan-header">
+              <div class="challan-brand">Raghuvir Sweets & Bakers</div>
+              <div class="challan-title">Dispatch Challan</div>
+              <div class="challan-meta-row"><span>From: <b>Savali Factory</b></span><span>To: <b>${branchName}</b></span></div>
+              <div class="challan-meta-row" style="margin-top:4px;"><span>🕐 Sent: <b>${batch.timestampDisplay}</b></span><span class="received-tag">✅ Received</span></div>
+              <div class="challan-meta-row" style="margin-top:4px;"><span>Received at: <b>${batch.receivedAtDisplay || '—'}</b></span></div>
+            </div>
+            <div class="challan-table">
+              <div class="challan-table-head"><span class="challan-col-num">#</span><span class="challan-col-item">Item Name</span><span class="challan-col-cat">Category</span><span class="challan-col-qty">Qty</span></div>
+              ${itemsHtml}
+            </div>
+            <div class="challan-footer"><span>Total Items</span><span>${batch.items.length}</span></div>
+          </div>`;
       });
-      if (addedCount === 0) { setLogStatus("Enter at least one quantity before adding.", "error"); return; }
-      refreshHistoryLogDisplay();
-      setLogStatus(addedCount + " item(s) added into Workspace from Manual Entry.", "success");
-      inputs.forEach(function(inp){ inp.value = ""; inp.classList.remove("touched"); });
-      updateManualSummary();
-      closeManualEntryPanel();
+      box.innerHTML = html;
     }
 
-    function submitEntireDeskBatch() {
-      if (centralBatchCollection.length === 0) { setLogStatus("Staging batch is empty.", "error"); return; }
-      var confirmMsg = currentActiveMode === "in"
-        ? "Push this batch of " + centralBatchCollection.length + " item(s)?\n\nStock will be increased (+) at Savali Factory for each item."
-        : "Push this batch of " + centralBatchCollection.length + " item(s)?\n\nStock will be reduced (-) at Savali Factory immediately, and will show as PENDING for " + selectedBranchName + " until they confirm receipt on their Branch Dashboard.";
-      if (!confirm(confirmMsg)) return;
-
-      setLogStatus("Uploading batch...", "");
-      var batchSnapshot = centralBatchCollection.slice();
-      var dispatchBranchSnapshot = selectedBranchName;
-
-      google.script.run.withSuccessHandler(function(res){
-        if (res && res.success) {
-          if (currentActiveMode === "out") showChallanPreview(batchSnapshot, dispatchBranchSnapshot);
-          else { alert("All entries pushed successfully! Stock updated."); centralBatchCollection = []; refreshHistoryLogDisplay(); exitDashboardScreen(); }
-        } else setLogStatus("Save failed: " + (res && res.error ? res.error : "unknown error"), "error");
-      }).withFailureHandler(function(e){ setLogStatus("Submission error: " + e.message, "error"); }).saveBatchTransactionsWeb(centralBatchCollection);
-    }
-
-    var pendingChallanItems = null, pendingChallanBranch = null;
-
-    function buildChallanMetaStrings() {
-      var now = new Date();
-      return { dateStr: now.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }), timeStr: now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) };
-    }
-
-    function showChallanPreview(items, branchName) {
-      pendingChallanItems = items; pendingChallanBranch = branchName;
-      var meta = buildChallanMetaStrings();
-      var itemsHtml = "";
-      items.forEach(function(it, idx){
-        itemsHtml += `<div class="challan-item-row"><span class="challan-col-num">${idx + 1}</span><span class="challan-col-item">${it.product}</span><span class="challan-col-cat">${it.category || '-'}</span><span class="challan-col-qty">x${it.qty}</span></div>`;
-      });
-      $("challan-preview-body").innerHTML = `
-        <div class="challan-header">
-          <div class="challan-brand">Raghuvir Sweets & Bakers</div>
-          <div class="challan-title">Dispatch Challan</div>
-          <div class="challan-meta-row"><span>From: <b>Savali Factory</b></span><span>To: <b>${branchName || '-'}</b></span></div>
-          <div class="challan-meta-row" style="margin-top:4px;"><span>🕐 <b>${meta.dateStr}  ${meta.timeStr}</b></span><span>${items.length} item(s)</span></div>
-        </div>
-        <div class="challan-table">
-          <div class="challan-table-head"><span class="challan-col-num">#</span><span class="challan-col-item">Item Name</span><span class="challan-col-cat">Category</span><span class="challan-col-qty">Qty</span></div>
-          ${itemsHtml}
-        </div>
-        <div class="challan-footer"><span>Total Items</span><span>${items.length}</span></div>
-        <p class="challan-note">This stock will appear as PENDING for ${branchName || 'the branch'} until receipt is confirmed on their Branch Dashboard.</p>`;
-      $("challan-preview-backdrop").classList.add("open");
-    }
-
-    function downloadChallanPDF() { if (pendingChallanItems) generateDispatchChallanPDF(pendingChallanItems, pendingChallanBranch); }
-
-    function closeChallanPreview() {
-      $("challan-preview-backdrop").classList.remove("open");
-      pendingChallanItems = null; pendingChallanBranch = null;
-      centralBatchCollection = []; refreshHistoryLogDisplay();
-      exitDashboardScreen();
-    }
-
-    function generateDispatchChallanPDF(items, branchName) {
-      try {
-        var jsPDFLib = window.jspdf && window.jspdf.jsPDF;
-        if (!jsPDFLib) { console.error("jsPDF not loaded"); return; }
-        var doc = new jsPDFLib({ unit: "pt", format: "a4" });
-        var pageWidth = doc.internal.pageSize.getWidth();
-        var marginX = 40, y = 50;
-
-        doc.setFont("helvetica", "bold"); doc.setFontSize(18);
-        doc.text("Raghuvir Sweets & Bakers", pageWidth / 2, y, { align: "center" });
-        y += 22; doc.setFontSize(13); doc.setTextColor(166, 60, 25);
-        doc.text("DISPATCH CHALLAN", pageWidth / 2, y, { align: "center" });
-        doc.setTextColor(0, 0, 0);
-        y += 26; doc.setDrawColor(220, 210, 191); doc.line(marginX, y, pageWidth - marginX, y);
-
-        var meta = buildChallanMetaStrings();
-        y += 24; doc.setFont("helvetica", "bold"); doc.setFontSize(11);
-        doc.text("Dispatched To:", marginX, y); doc.setFont("helvetica", "normal"); doc.text(branchName || "-", marginX + 100, y);
-        doc.setFont("helvetica", "bold"); doc.text("From:", pageWidth - marginX - 160, y); doc.setFont("helvetica", "normal"); doc.text("Savali Factory", pageWidth - marginX - 110, y);
-
-        y += 18; doc.setFont("helvetica", "bold"); doc.text("Date & Time:", marginX, y); doc.setFont("helvetica", "normal"); doc.text(meta.dateStr + "  " + meta.timeStr, marginX + 100, y);
-        y += 22; doc.line(marginX, y, pageWidth - marginX, y);
-
-        y += 20;
-        var col1 = marginX, col2 = marginX + 40, col3 = marginX + 300, col4 = pageWidth - marginX - 60;
-        doc.setFont("helvetica", "bold"); doc.setFontSize(10);
-        doc.text("#", col1, y); doc.text("Item Name", col2, y); doc.text("Category", col3, y); doc.text("Qty", col4, y);
-        y += 6; doc.line(marginX, y, pageWidth - marginX, y);
-
-        doc.setFont("helvetica", "normal");
-        var pageHeight = doc.internal.pageSize.getHeight();
-        for (var i = 0; i < items.length; i++) {
-          y += 18;
-          if (y > pageHeight - 80) { doc.addPage(); y = 50; }
-          var it = items[i];
-          doc.text(String(i + 1), col1, y);
-          doc.text(String(it.product || ""), col2, y, { maxWidth: 250 });
-          doc.text(String(it.category || "-"), col3, y);
-          doc.text(String(it.qty), col4, y);
-        }
-
-        y += 14; doc.line(marginX, y, pageWidth - marginX, y);
-        y += 20; doc.setFont("helvetica", "bold"); doc.text("Total Items: " + items.length, marginX, y);
-        y += 40; doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(120, 110, 100);
-        doc.text("This stock will appear as PENDING for " + (branchName || "the branch") + " until receipt is confirmed on the Branch Dashboard.", marginX, y);
-
-        var fileName = "Dispatch_Challan_" + (branchName || "Branch").replace(/\s+/g, "_") + "_" + Date.now() + ".pdf";
-        doc.save(fileName);
-      } catch (err) { console.error("PDF generation failed:", err); }
-    }
-
-    function setLogStatus(msg, classification) {
-      var bar = $("dashboard-status-log");
-      if (!bar) return;
-      bar.innerText = msg;
-      bar.className = "status-msg-bar " + classification;
-    }
+    window.addEventListener('DOMContentLoaded', function () {
+      var matched = VALID_BRANCHES.find(function(b){ return b.toLowerCase() === branchName.toLowerCase(); });
+      if (!matched) {
+        $("branch-name-tag").innerText = "⚠ No valid branch specified in link";
+        $("pending-list").innerHTML = '<div class="empty-note">This link is missing a valid ?branch= parameter. Ask your admin for the correct branch dashboard link (see the Links tab in the Admin Dashboard).</div>';
+        return;
+      }
+      branchName = matched;
+      $("branch-name-tag").innerText = "📍 " + branchName;
+      loadPendingDispatches();
+    });
   </script>
 </body>
 </html>
