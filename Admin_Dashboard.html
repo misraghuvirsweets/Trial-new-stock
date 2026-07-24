@@ -417,6 +417,96 @@
   </div>
 
   <script>
+    // ============================================================================
+    // ⚠️ EDIT THIS — paste your deployed Apps Script Web App URL (ends in /exec).
+    // Deploy: Apps Script editor → Deploy → New deployment → Web app → Execute as Me,
+    // Access: Anyone. Copy the resulting URL here.
+    var APPS_SCRIPT_URL = 'PASTE_YOUR_DEPLOYED_WEB_APP_EXEC_URL_HERE';
+    // ============================================================================
+    //
+    // This page is hosted outside Apps Script (e.g. GitHub Pages), so it can't use
+    // google.script.run directly — that only works for HTML served BY Apps Script.
+    // This shim recreates the same google.script.run.functionName(args)
+    //   .withSuccessHandler(fn).withFailureHandler(fn)
+    // call pattern used throughout this file, but sends each call as a JSONP
+    // request (a dynamically-inserted <script> tag) to the deployed Web App,
+    // which routes it to the real server function via ?action=functionName.
+    // JSONP is used (not fetch) because Apps Script Web App responses don't
+    // include CORS headers, so a cross-origin fetch() would be blocked by the
+    // browser — a <script> tag isn't subject to that restriction.
+    (function () {
+      var callbackCounter = 0;
+
+      function jsonpCall(functionName, args, successHandler, failureHandler) {
+        if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.indexOf('PASTE_YOUR_DEPLOYED') === 0) {
+          var msg = 'APPS_SCRIPT_URL is not set yet — paste your deployed /exec URL at the top of the <script> block.';
+          console.error(msg);
+          if (failureHandler) failureHandler({ message: msg });
+          return;
+        }
+
+        var callbackName = '__gs_cb_' + (callbackCounter++) + '_' + Date.now();
+        var script = document.createElement('script');
+
+        function cleanup() {
+          delete window[callbackName];
+          if (script.parentNode) script.parentNode.removeChild(script);
+        }
+
+        window[callbackName] = function (response) {
+          cleanup();
+          if (!response || response.__ok === false) {
+            var errMsg = (response && response.__error) || ('Unknown server error calling ' + functionName);
+            if (failureHandler) failureHandler({ message: errMsg }); else console.error(errMsg);
+            return;
+          }
+          if (successHandler) successHandler(response.result);
+        };
+
+        var url = APPS_SCRIPT_URL
+          + '?action=' + encodeURIComponent(functionName)
+          + '&callback=' + encodeURIComponent(callbackName)
+          + '&args=' + encodeURIComponent(JSON.stringify(args || []));
+
+        script.src = url;
+        script.onerror = function () {
+          cleanup();
+          if (failureHandler) failureHandler({ message: 'Network error calling ' + functionName + ' (check APPS_SCRIPT_URL and that the deployment is accessible to Anyone).' });
+        };
+        document.body.appendChild(script);
+      }
+
+      function makeRunProxy() {
+        var pendingSuccess = null;
+        var pendingFailure = null;
+
+        var proxy = new Proxy({}, {
+          get: function (target, prop) {
+            if (prop === 'withSuccessHandler') {
+              return function (fn) { pendingSuccess = fn; return proxy; };
+            }
+            if (prop === 'withFailureHandler') {
+              return function (fn) { pendingFailure = fn; return proxy; };
+            }
+            if (prop === 'withUserObject') {
+              return function () { return proxy; }; // not needed here, no-op for compatibility
+            }
+            return function () {
+              var args = Array.prototype.slice.call(arguments);
+              var s = pendingSuccess, f = pendingFailure;
+              pendingSuccess = null;
+              pendingFailure = null;
+              jsonpCall(String(prop), args, s, f);
+            };
+          }
+        });
+        return proxy;
+      }
+
+      window.google = window.google || {};
+      window.google.script = window.google.script || {};
+      window.google.script.run = makeRunProxy();
+    })();
     function $(id){ return document.getElementById(id); }
     var BRANCHES = ['Ram Mandir', 'Vishrambagh', 'Miraj'];
     var LOCATION_ORDER = ["Savali Factory"].concat(BRANCHES);
